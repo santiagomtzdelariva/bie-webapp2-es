@@ -7,6 +7,7 @@ grails.project.target.level = 1.6
 grails.project.source.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
+grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
@@ -24,6 +25,7 @@ grails.project.dependency.resolution = {
         mavenCentral()
         mavenLocal()
         mavenRepo "http://maven.ala.org.au/repository"
+        mavenRepo "http://maven.tmatesoft.com/content/repositories/releases/"
 
         // uncomment these to enable remote dependency resolution from public Maven repositories
         //mavenCentral()
@@ -35,41 +37,41 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        // "au.org.ala:bie-profile:1.0-SNAPSHOT"
-        compile group:'au.org.ala',
-                name:'bie-profile',
-                version:'1.1-SNAPSHOT',
-                transitive:false
+
+        compile("au.org.ala:bie-profile:1.1-SNAPSHOT") {
+            transitive = false
+        }
+
         compile "commons-httpclient:commons-httpclient:3.1",
 //                "atg:json-taglib:0.4.1",
                 "org.codehaus.jackson:jackson-core-asl:1.8.6",
                 "org.codehaus.jackson:jackson-mapper-asl:1.8.6"
-        compile group:'au.org.ala',
-                name:'ala-cas-client',
-                version:'1.0-SNAPSHOT',
-                transitive:false
+//        compile group:'au.org.ala',
+//                name:'ala-cas-client',
+//                version:'1.0-SNAPSHOT',
+//                transitive:false
         compile 'org.jasig.cas.client:cas-client-core:3.1.12'
         runtime 'org.jsoup:jsoup:1.7.2'
         // runtime 'mysql:mysql-connector-java:5.1.16'
     }
 
     plugins {
-        runtime ":hibernate:$grailsVersion"
+        runtime ":hibernate:3.6.10.15"
         runtime ":jquery:1.7.1"
-        runtime ":resources:1.2"
+        runtime ":resources:1.2.8"
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0"
         //runtime ":yui-minify-resources:0.1.4"
         // Moved these plugins from application.properties file
         compile ':cache:1.0.1'
         runtime ":cached-resources:1.0"
-        runtime ":cache-headers:1.1.5"
-        runtime ":rest:0.7"
+        runtime ":cache-headers:1.1.6"
+        runtime ":rest:0.8"
 
-        compile(":ala-web-theme:0.2.3") {
+        compile(":ala-web-theme:[0.1,]") {
             excludes "jquery","resources","cache","servlet-api"
         }
 
-        build ":tomcat:$grailsVersion"
+        build ":tomcat:7.0.53"
     }
 }

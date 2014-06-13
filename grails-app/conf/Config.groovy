@@ -17,6 +17,8 @@ if (System.properties["${appName}.config.location"]) {
 /******************************************************************************\
  *  EXTERNAL SERVERS
  \******************************************************************************/
+runWithNoExternalConfig = true
+
 if(!bie.baseURL){
     bie.baseURL = "http://bie.ala.org.au"
 }
@@ -60,7 +62,7 @@ if(!collectory.threatenedSpeciesCodesUrl){
     collectory.threatenedSpeciesCodesUrl = collectory.baseURL + "/public/showDataResource"
 }
 if(!ranking.readonly){
-    ranking.readonly = false
+    ranking.readonly = true // revert when ranking of images is fixed
 }
 if(!headerAndFooter.baseURL){
     headerAndFooter.baseURL = 'http://www2.ala.org.au/commonui'
@@ -246,3 +248,26 @@ log4j = {
            'grails.app.resourceMappers.org.grails.plugin.resource'
     debug  'au.org.ala.bie.webapp2'
 }
+// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
+
+/* remove this line 
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside null
+                scriptlet = 'none' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        filteringCodecForContentType {
+            //'text/html' = 'html'
+        }
+    }
+}
+remove this line */

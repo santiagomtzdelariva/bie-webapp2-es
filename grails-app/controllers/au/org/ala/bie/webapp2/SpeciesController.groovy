@@ -98,6 +98,7 @@ class SpeciesController {
                     isAustralian: bieService.getIsAustralian(etc.taxonConcept?.guid?:guid),
                     isRoleAdmin: authService.userInRole(grailsApplication.config.auth.admin_role),
                     userName: authService.email,
+                    images: biocacheService.getSpeciesImages(etc),
                     isReadOnly: grailsApplication.config.ranking.readonly, // TODO: implement this properly based on BIE version
                     sortCommonNameSources: utilityService.getNamesAsSortedMap(etc.commonNames),
                     taxonHierarchy: bieService.getClassificationForGuid(guid),

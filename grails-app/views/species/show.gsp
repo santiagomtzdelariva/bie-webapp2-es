@@ -82,6 +82,8 @@
                     $('#sounds').append('<span>Source: ' + source + '</span><br/>' );
                     $('#sounds').append('<span><a href="${biocacheUrl}/occurrence/'+ data.raw.uuid +'">View more details of this audio</a></span>' );
                 }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                //alert( "error" + errorThrown);
             });
         })
     </r:script>
@@ -440,12 +442,12 @@
                 </section><!--#overview-->
                 <g:if test="${tc.taxonConcept?.rankID?:0 >= 6000}">
                     <section class="tab-pane" id="gallery">
-                        <g:if test="${tc.images}">
+                        <g:if test="${images}">
                             <h2>Images</h2>
                             <div id="imageGallery">
-                                <g:each var="image" in="${tc.images}" status="status">
+                                <g:each var="image" in="${images}" status="status">
                                     <g:if test="${!image.isBlackListed}">
-                                        <a class="thumbImage" rel="thumbs" title="${image.title?:''}" href="${image.largeImageUrl}"
+                                        <a class="thumbImage" rel="thumbs" title="${image.title?:''}" href="${image.largeImageUrl}" data-occurrenceuid="${image.occurrenceUid}"
                                            id="thumb${status}"><img src="${image.smallImageUrl}" alt="${image.infoSourceName}"
                                                                           alt="${image.title}" height="100px"
                                                                           style="height:100px;padding-right:3px;"/></a>
@@ -463,9 +465,15 @@
                                             <g:if test="${image.licence}">
                                                 <span class="imageMetadataField">Licence:</span> ${image.licence}<br/>
                                             </g:if>
+                                            <g:else>
+                                                <span class="hide imageMetadataField licence">Licence: <span class="imageLicence"></span><br/></span>
+                                            </g:else>
                                             <g:if test="${image.rights}">
                                                 <span class="imageMetadataField">Rights:</span> ${image.rights}<br/>
                                             </g:if>
+                                            <g:else>
+                                                <span class="hide imageMetadataField rights">Rights: <span class="imageRights"></span><br/></span>
+                                            </g:else>
                                             <!-- Flickr images need to use identifier instead of isPartOf for the imageUri -->
                                             <g:set var="imageUri">
                                                 <g:if test="${image.isPartOf && !image.identifier?.startsWith('http://www.flickr.com') }">

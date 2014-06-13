@@ -61,21 +61,47 @@ $(document).ready(function() {
             var titleBits = this.title.split("|");
             return "<a href='"+titleBits[1]+"'>"+titleBits[0]+"</a>"; },
         opacity: 0.5,
+        photo: true,
         maxWidth: "80%",
         maxHeight: "80%",
         preloading: false,
         onComplete: function() {
             $("#cboxTitle").html(""); // Clear default title div
             var index = $(this).attr('id').replace("thumb",""); // get the imdex of this image
-            var titleHtml = $("div#thumbDiv"+index).html(); // use index to load meta data
+            var contentElement = $("div#thumbDiv"+index);
             //console.log("index", index, "titleHtml", titleHtml);
-            $("<div id='titleText'>"+titleHtml+"</div>").insertAfter("img.cboxPhoto");
-            $("div#titleText").css("padding-top","8px");
-            var cbox = $.fn.colorbox;
-            if ( cbox != undefined){
-                cbox.resize();
-            } else{
-                //console.log("cboxis undefined 0: " + cbox);
+            // common code
+            function writeContent(el) {
+                var titleHtml = el.html(); // use index to load meta data
+                $("<div id='titleText'>"+titleHtml+"</div>").insertAfter("img.cboxPhoto");
+                $("div#titleText").css("padding-top","8px");
+                var cbox = $.fn.colorbox;
+                if ( cbox != undefined){
+                    cbox.resize();
+                }
+            }
+
+            // load extra data via JSON GET
+            var occurrenceUid = $(this).data('occurrenceuid'); // always lower case
+            if (occurrenceUid) {
+                var url = SHOW_CONF.biocacheUrl + "/ws/occurrences/" + occurrenceUid + ".json?callback=?";
+                //console.log('occurrenceUid', occurrenceUid, url);
+                $.ajax({
+                    url: url,
+                    dataType: "jsonp",
+                    async: false
+                }).done(function(data) {
+                    //console.log('data.raw', data.raw);
+                    if (data.raw && data.raw.occurrence && data.raw.occurrence.rights) {
+                        //console.log('rights', data.raw.occurrence.rights, contentElement.find('.imageMetadataField.rights').text());
+                        contentElement.find('.imageMetadataField.rights').removeClass('hide');
+                        contentElement.find('.imageRights').html(data.raw.occurrence.rights);
+                    }
+
+                    writeContent(contentElement);
+                });
+            } else {
+                writeContent(contentElement);
             }
         }
     });
