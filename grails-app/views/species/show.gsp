@@ -442,101 +442,25 @@
                 </section><!--#overview-->
                 <g:if test="${tc.taxonConcept?.rankID?:0 >= 6000}">
                     <section class="tab-pane" id="gallery">
-                        <g:if test="${images}">
-                            <h2>Images</h2>
-                            <div id="imageGallery">
-                                <g:each var="image" in="${images}" status="status">
-                                    <g:if test="${!image.isBlackListed}">
-                                        <a class="thumbImage" rel="thumbs" title="${image.title?:''}" href="${image.largeImageUrl}" data-occurrenceuid="${image.occurrenceUid}"
-                                           id="thumb${status}"><img src="${image.smallImageUrl}" alt="${image.infoSourceName}"
-                                                                          alt="${image.title}" height="100px"
-                                                                          style="height:100px;padding-right:3px;"/></a>
-                                        <div id="thumbDiv${status}" style="display:none;">
-                                            <g:if test="${image.title}">
-                                                <span class="imageTitle">${image.title}</span><br/>
-                                            </g:if>
-                                            <g:if test="${image.creator}">
-                                                <span class="imageMetadataField">Image by:</span>
-                                                <bie:lookupUserName id="${image.creator}"/><br/>
-                                            </g:if>
-                                            <g:if test="${image.locality}">
-                                                <span class="imageMetadataField">Locality:</span> ${image.locality}<br/>
-                                            </g:if>
-                                            <g:if test="${image.licence}">
-                                                <span class="imageMetadataField">Licence:</span> ${image.licence}<br/>
-                                            </g:if>
-                                            <g:else>
-                                                <span class="hide imageMetadataField licence">Licence: <span class="imageLicence"></span><br/></span>
-                                            </g:else>
-                                            <g:if test="${image.rights}">
-                                                <span class="imageMetadataField">Rights:</span> ${image.rights}<br/>
-                                            </g:if>
-                                            <g:else>
-                                                <span class="hide imageMetadataField rights">Rights: <span class="imageRights"></span><br/></span>
-                                            </g:else>
-                                            <!-- Flickr images need to use identifier instead of isPartOf for the imageUri -->
-                                            <g:set var="imageUri">
-                                                <g:if test="${image.isPartOf && !image.identifier?.startsWith('http://www.flickr.com') }">
-                                                    ${image.isPartOf}
-                                                </g:if>
-                                                <g:elseif test="${image.identifier}">
-                                                    ${image.identifier}
-                                                </g:elseif>
-                                                <g:else>
-                                                    ${image.infoSourceURL}
-                                                </g:else>
-                                            </g:set>
-                                            <g:if test="${image.infoSourceURL == 'http://www.ala.org.au'}">
-                                                <cite><span class="imageMetadataField">Source:</span> ${image.infoSourceName}</cite>
-                                            </g:if>
-                                            <g:elseif test="${image.infoSourceURL == 'http://www.elfram.com/'}">
-                                                <cite><span class="imageMetadataField">Source:</span> <a href="${image.infoSourceURL}" target="_blank" class="external">${image.infoSourceName}</a></cite>
-                                            </g:elseif>
-                                            <g:else>
-                                                <cite><span class="imageMetadataField">Source:</span> <a href="${imageUri}" target="_blank" class="external">${image.infoSourceName}</a></cite>
-                                            </g:else>
-                                            <g:if test="${image.occurrenceUid}">
-                                                <p><a href="http://biocache.ala.org.au/occurrences/${image.occurrenceUid}" target="_blank">View more details for this image</a></p>
-                                            </g:if>
-                                            <g:if test="${!isReadOnly}">
-                                                <p class="imageRank-${image.documentId}">
-                                                    %{--<cite>--}%
-                                                        <g:if test="${rankedImageUris?.contains(image.identifier)}">
-                                                            You have ranked this image as
-                                                            <g:if test="${!rankedImageUriMap[image.identifier]}">
-                                                                NOT
-                                                            </g:if>
-                                                            representative of ${tc.taxonConcept.nameString}
-                                                        </g:if>
-                                                        <g:else>
-                                                                Is this image representative of ${tc.taxonConcept.rankString}?
-                                                                <a class="isrepresent"
-                                                                   href="#" onclick="rankThisImage('${guid}','${image.identifier}','${image.infoSourceId}','${image.documentId}',false,true,'${tc.taxonConcept.nameString}');return false;">
-                                                                    YES
-                                                                </a> |
-                                                                <a class="isnotrepresent" href="#"
-                                                                        onclick="rankThisImage('${guid}','${image.identifier}','${image.infoSourceId}','${image.documentId}',false,false,'${tc.taxonConcept.nameString}');return false;">
-                                                                    NO
-                                                                </a>
-                                                                <g:if test="${isRoleAdmin}">
-                                                                    <br/><a class="isnotrepresent" href="#"
-                                                                            onclick="rankThisImage('${guid}','${image.identifier}','${image.infoSourceId}','${image.documentId}',true,false,'${tc.taxonConcept.nameString}');return false;">
-                                                                        BlackList</a> |
-                                                                    <a class="isnotrepresent" href="#" onClick="editThisImage('${guid}', '${image.identifier}');return false;">Edit</a>
-                                                                </g:if>
-                                                        </g:else>
-                                                    %{--</cite>--}%
-                                                </p>
-                                            </g:if>
-                                            <g:else>
-                                                <p class="imageRank-${image.documentId}">
-                                                    <b>Read Only Mode</b>
-                                                </p>
-                                            </g:else>
-                                        </div>
-                                    </g:if>
-                                </g:each>
-                            </div>
+                        <g:if test="${typeImages || otherImages || specimenImages}">
+                            <g:if test="${typeImages}">
+                                <h2>Type images</h2>
+                                <div id="typeGallery">
+                                    <g:render template="images" model="${[images: typeImages, includeName: true]}"/>
+                                </div>
+                            </g:if>
+                            <g:if test="${specimenImages}">
+                                <h2>Specimen images</h2>
+                                <div id="specimenGallery">
+                                    <g:render template="images" model="${[images: specimenImages, includeName: false]}"/>
+                                </div>
+                            </g:if>
+                            <g:if test="${otherImages}">
+                                <h2>Contributed images</h2>
+                                <div id="otherGallery">
+                                    <g:render template="images" model="${[images: otherImages, includeName: false]}"/>
+                                </div>
+                            </g:if>
                         </g:if>
                         <g:elseif test="${tc.screenshotImages}">
                             <h2 style="margin-top:20px;">Videos</h2>

@@ -1,6 +1,7 @@
 package au.org.ala
 
 import org.apache.commons.lang.StringEscapeUtils
+import au.org.ala.names.parser.PhraseNameParser
 
 class BieTagLib {
     static namespace = 'bie'     // namespace for headers and footers
@@ -17,7 +18,17 @@ class BieTagLib {
         def name = attrs.name
 
         if (rankId >= 6000) {
-            out << "<i>" + name + "</i>"
+            def output = "<i>" + name + "</i>"
+            PhraseNameParser pnp = new PhraseNameParser()
+
+            try {
+                def pn = pnp.parse(name) // attempt to parse phrase name
+                output = "<i>${pn.canonicalSpeciesName()}</i> ${pn.authorshipComplete()}"
+            } catch (Exception ex) {
+                log.warn "Error parsing name (${name}): ${ex}", ex
+            }
+
+            out << output
         } else {
             out << name
         }

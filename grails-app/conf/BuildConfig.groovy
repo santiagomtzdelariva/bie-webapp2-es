@@ -41,6 +41,9 @@ grails.project.dependency.resolution = {
         compile("au.org.ala:bie-profile:1.1-SNAPSHOT") {
             transitive = false
         }
+        compile("au.org.ala:ala-name-matching:2.1-SNAPSHOT") {
+            excludes "lucene-core, lucene-analyzers-common, lucene-queryparser"
+        }
 
         compile "commons-httpclient:commons-httpclient:3.1",
 //                "atg:json-taglib:0.4.1",

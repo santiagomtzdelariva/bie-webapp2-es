@@ -228,4 +228,24 @@ class UtilityService {
     def getJsonMimeType(params) {
         (params.callback) ? "text/javascript" : "application/json"
     }
+
+    def Map<BiocacheService.ImageCategory, List> splitImages(List images) {
+        Map<BiocacheService.ImageCategory, List> imageCategories = [:]
+        // initialise Map with empty List values
+        imageCategories.put(BiocacheService.ImageCategory.TYPE, [])
+        imageCategories.put(BiocacheService.ImageCategory.SPECIMEN, [])
+        imageCategories.put(BiocacheService.ImageCategory.OTHER, [])
+
+        images.each { img ->
+            if (img.category == BiocacheService.ImageCategory.TYPE) {
+                imageCategories.get(BiocacheService.ImageCategory.TYPE).add(img)
+            } else if (img.category == BiocacheService.ImageCategory.SPECIMEN) {
+                imageCategories.get(BiocacheService.ImageCategory.SPECIMEN).add(img)
+            } else {
+                imageCategories.get(BiocacheService.ImageCategory.OTHER).add(img)
+            }
+        }
+
+        imageCategories
+    }
 }
