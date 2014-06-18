@@ -184,7 +184,7 @@ environments {
         grails.serverURL = "http://bie-test.ala.org.au"
         security.cas.appServerName = grails.serverURL
         security.cas.contextPath = ""
-        log4j.appender.'errors.File'="/var/log/tomcat/biewebapp2-stacktrace.log"
+        //log4j.appender.'errors.File'="/var/log/tomcat/biewebapp2-stacktrace.log"
     }
     production {
         grails.logging.jul.usebridge = false
@@ -192,11 +192,11 @@ environments {
         grails.serverURL = "http://bie.ala.org.au"
         security.cas.appServerName = grails.serverURL
         security.cas.contextPath = ""
-        log4j.appender.'errors.File'="/var/log/tomcat6/biewebapp2-stacktrace.log"
+        //log4j.appender.'errors.File'="/var/log/tomcat6/biewebapp2-stacktrace.log"
     }
 }
 
-logging.dir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs'  : '/var/log/tomcat6/')
+logging.dir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs'  : '/var/log/tomcat6')
 
 // log4j configuration
 log4j = {
