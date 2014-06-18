@@ -456,7 +456,7 @@
                                 </div>
                             </g:if>
                             <g:if test="${otherImages}">
-                                <h2>Contributed images</h2>
+                                <h2>Other images</h2>
                                 <div id="otherGallery">
                                     <g:render template="images" model="${[images: otherImages, includeName: false]}"/>
                                 </div>

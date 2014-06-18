@@ -212,7 +212,7 @@ log4j = {
                     file: "/var/log/tomcat6/biewebapp2-stacktrace.log"
             }
             development{
-                console name: "stdout", layout: pattern(conversionPattern: "%d [%c{1}]  %m%n"),
+                console name: "stdout", layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n"),
                     threshold: org.apache.log4j.Level.DEBUG
             }
         }

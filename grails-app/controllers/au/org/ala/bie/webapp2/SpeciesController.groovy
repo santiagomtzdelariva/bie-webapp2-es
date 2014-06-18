@@ -15,8 +15,6 @@
 
 package au.org.ala.bie.webapp2
 
-import grails.converters.JSON
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
@@ -79,38 +77,49 @@ class SpeciesController {
      */
     def show = {
         def guid = params.guid
-        def etc = bieService.getTaxonConcept(guid.encodeAsURL())
 
-        if (!etc) {
-            log.error "Error requesting taxon concept object: " + params.guid
-            response.status = 404
-            render(view: '../error', model: [message: "Requested taxon <b>" + params.guid + "</b> was not found"])
-        } else if (etc instanceof JSONObject && etc.has("error")) {
-            log.error "Error requesting taxon concept object: " + etc.error
-            render(view: '../error', model: [message: etc.error])
+        if (guid =~ /\.json$/ || guid =~ /\.xml/) {
+            // redirect to webservice
+            log.debug "redirecting with ${guid}"
+            //redirect(controller: 'legacyWebServices', action: 'speciesJson', params: [guid: guid.replace('.json','')])
+            redirect(url: grailsApplication.config.bie.baseURL + "/ws/species/" + guid)
         } else {
-            Map<BiocacheService.ImageCategory, List> imageCategories = utilityService.splitImages(biocacheService.getSpeciesImages(etc))
+            def etc = bieService.getTaxonConcept(guid.encodeAsURL())
+            log.debug "show - guid = ${guid} "
 
-            render(view: 'show', model: [
-                    tc: etc,
-                    statusRegionMap: utilityService.getStatusRegionCodes(),
-                    infoSourceMap: utilityService.getInfoSourcesForTc(etc), // fallback for bieService.getInfoSourcesForGuid(guid)
-                    extraImages: bieService.getExtraImages(etc),
-                    textProperties: utilityService.filterSimpleProperties(etc),
-                    isAustralian: bieService.getIsAustralian(etc.taxonConcept?.guid?:guid),
-                    isRoleAdmin: authService.userInRole(grailsApplication.config.auth.admin_role),
-                    userName: authService.email,
-                    typeImages: imageCategories.get(BiocacheService.ImageCategory.TYPE),
-                    specimenImages: imageCategories.get(BiocacheService.ImageCategory.SPECIMEN),
-                    otherImages: imageCategories.get(BiocacheService.ImageCategory.OTHER),
-                    isReadOnly: grailsApplication.config.ranking.readonly, // TODO: implement this properly based on BIE version
-                    sortCommonNameSources: utilityService.getNamesAsSortedMap(etc.commonNames),
-                    taxonHierarchy: bieService.getClassificationForGuid(guid),
-                    childConcepts: bieService.getChildConceptsForGuid(guid),
-                    speciesList: bieService.getSpeciesList(etc.taxonConcept?.guid?:guid)
+            if (!etc) {
+                log.error "Error requesting taxon concept object: " + params.guid
+                response.status = 404
+                render(view: '../error', model: [message: "Requested taxon <b>" + params.guid + "</b> was not found"])
+            } else if (etc instanceof JSONObject && etc.has("error")) {
+                log.error "Error requesting taxon concept object: " + etc.error
+                render(view: '../error', model: [message: etc.error])
+            } else {
+                Map<BiocacheService.ImageCategory, List> imageCategories = utilityService.splitImages(biocacheService.getSpeciesImages(etc))
+
+                render(view: 'show', model: [
+                        tc: etc,
+                        statusRegionMap: utilityService.getStatusRegionCodes(),
+                        infoSourceMap: utilityService.getInfoSourcesForTc(etc), // fallback for bieService.getInfoSourcesForGuid(guid)
+                        extraImages: bieService.getExtraImages(etc),
+                        textProperties: utilityService.filterSimpleProperties(etc),
+                        isAustralian: bieService.getIsAustralian(etc.taxonConcept?.guid?:guid),
+                        isRoleAdmin: authService.userInRole(grailsApplication.config.auth.admin_role),
+                        userName: authService.email,
+                        typeImages: imageCategories.get(BiocacheService.ImageCategory.TYPE),
+                        specimenImages: imageCategories.get(BiocacheService.ImageCategory.SPECIMEN),
+                        otherImages: imageCategories.get(BiocacheService.ImageCategory.OTHER),
+                        isReadOnly: grailsApplication.config.ranking.readonly, // TODO: implement this properly based on BIE version
+                        sortCommonNameSources: utilityService.getNamesAsSortedMap(etc.commonNames),
+                        taxonHierarchy: bieService.getClassificationForGuid(guid),
+                        childConcepts: bieService.getChildConceptsForGuid(guid),
+                        speciesList: bieService.getSpeciesList(etc.taxonConcept?.guid?:guid)
                 ]
-            )
+                )
+            }
         }
+
+
     }
 
     /**

@@ -53,6 +53,8 @@
                     <div class="meta brief">
                         <bie:formatSciName name="${image.name}" rankId="${image.taxonRankID}"/>
                         <g:if test="${image.type}"><br>Type: ${image.type}</g:if>
+                        <g:if test="${image.institutionName}"><br>${image.institutionName}</g:if>
+                        <g:elseif test="${image.infoSourceName}"><br>${image.infoSourceName}</g:elseif>
                     </div>
                 </g:if>
                 <g:else>

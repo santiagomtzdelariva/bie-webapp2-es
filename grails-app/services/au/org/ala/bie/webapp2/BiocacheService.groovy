@@ -44,6 +44,7 @@ class BiocacheService {
                 img.taxonRankID = rec.taxonRankID
                 img.infoSourceURL = rec.occurrenceID // TODO: check its a URL
                 img.infoSourceName = rec.dataResourceName
+                img.institutionName = rec.institutionName
                 img.occurrenceUid = rec.uuid
                 img.largeImageUrl = rec.largeImageUrl
                 img.smallImageUrl = rec.smallImageUrl
