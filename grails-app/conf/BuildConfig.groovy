@@ -42,7 +42,7 @@ grails.project.dependency.resolution = {
             transitive = false
         }
         compile("au.org.ala:ala-name-matching:2.1-SNAPSHOT") {
-            excludes "lucene-core, lucene-analyzers-common, lucene-queryparser"
+            excludes "lucene-core", "lucene-analyzers-common", "lucene-queryparser", "simmetrics"
         }
 
         compile "commons-httpclient:commons-httpclient:3.1",

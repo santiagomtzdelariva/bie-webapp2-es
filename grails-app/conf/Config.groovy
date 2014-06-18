@@ -196,6 +196,7 @@ environments {
     }
 }
 
+logging.dir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs'  : '/var/log/tomcat6/')
 
 // log4j configuration
 log4j = {
@@ -204,12 +205,12 @@ log4j = {
             production {
                 rollingFile name: "bie-prod",
                     maxFileSize: 104857600,
-                    file: "/var/log/tomcat6/biewebapp2.log",
+                    file: logging.dir + "/biewebapp2.log",
                     threshold: org.apache.log4j.Level.DEBUG,
                     layout: pattern(conversionPattern: "%-5p: %d [%c{1}]  %m%n")
                 rollingFile name: "stacktrace",
                     maxFileSize: 1024,
-                    file: "/var/log/tomcat6/biewebapp2-stacktrace.log"
+                    file: logging.dir + "/biewebapp2-stacktrace.log"
             }
             development{
                 console name: "stdout", layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n"),
