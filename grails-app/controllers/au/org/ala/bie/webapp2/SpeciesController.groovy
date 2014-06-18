@@ -28,6 +28,7 @@ class SpeciesController {
     def utilityService
     def authService
     def biocacheService
+    def webService
 
     /**
      * Search page - display search results fro the BIE (includes results for non-species pages too)
@@ -78,11 +79,13 @@ class SpeciesController {
     def show = {
         def guid = params.guid
 
-        if (guid =~ /\.json$/ || guid =~ /\.xml/) {
+        if (guid =~ /\.json$/ ) {
             // redirect to webservice
             log.debug "redirecting with ${guid}"
-            //redirect(controller: 'legacyWebServices', action: 'speciesJson', params: [guid: guid.replace('.json','')])
-            redirect(url: grailsApplication.config.bie.baseURL + "/ws/species/" + guid)
+            //redirect(url: grailsApplication.config.bie.baseURL + "/ws/species/" + guid)
+            render(contentType: 'application/json', text: webService.get(grailsApplication.config.bie.baseURL + "/ws/species/" + guid.replace('/.json', '')))
+        } else if (guid =~ /\.xml/) {
+            render(contentType: 'application/xml', text: webService.get(grailsApplication.config.bie.baseURL + "/ws/species/" + guid.replace('/.xml', '')))
         } else {
             def etc = bieService.getTaxonConcept(guid.encodeAsURL())
             log.debug "show - guid = ${guid} "
