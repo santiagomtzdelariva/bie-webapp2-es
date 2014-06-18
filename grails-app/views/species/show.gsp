@@ -456,13 +456,13 @@
                                 </div>
                             </g:if>
                             <g:if test="${otherImages}">
-                                <h2>Other images</h2>
+                                <h2>Images</h2>
                                 <div id="otherGallery">
                                     <g:render template="images" model="${[images: otherImages, includeName: false]}"/>
                                 </div>
                             </g:if>
                         </g:if>
-                        <g:elseif test="${tc.screenshotImages}">
+                        <g:if test="${tc.screenshotImages}">
                             <h2 style="margin-top:20px;">Videos</h2>
                             <div id="videosGallery">
                                 <g:each var="screenshot" in="${tc.screenshotImages}" status="status">
@@ -499,10 +499,10 @@
                                     </table>
                                 </g:each>
                             </div>
-                        </g:elseif>
-                        <g:else>
+                        </g:if>
+                        <g:if test="${!tc.screenshotImages && !(typeImages || otherImages || specimenImages)}">
                             <p>There are no images for this taxon</p>
-                        </g:else>
+                        </g:if>
                     </section><!--#gallery-->
                 </g:if>
                 <section class="tab-pane" id="names">

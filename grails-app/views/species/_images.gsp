@@ -27,9 +27,8 @@
         margin: 2px 0 2px 0;
         position: relative;
     }
-    .imgCon .brief {
-        color: black;
-        background-color: white;
+    .imgCon img {
+        height: 150px;
     }
     .imgCon .meta {
         opacity: 0.8;
@@ -41,25 +40,60 @@
         text-align: left;
         padding: 4px 5px 2px 5px;
     }
+    .imgCon .brief {
+        color: black;
+        background-color: white;
+    }
+    .imgCon .detail {
+        color: white;
+        background-color: black;
+        opacity: 0.7;
+    }
 </style>
+<r:script disposition='head'>
+    $(document).ready(function() {
+        // mouse over affect on thumbnail images
+        $('.imgCon').on('mouseenter', function() {
+            $(this).find('.brief').toggleClass('hide');
+            $(this).find('.detail').toggleClass('hide');
+        }).on('mouseleave', function() {
+            $(this).find('.brief').toggleClass('hide');
+            $(this).find('.detail').toggleClass('hide');
+        });
+    });
+</r:script>
 <g:each var="image" in="${images}" status="status">
     <g:if test="${!image.isBlackListed}">
         <div class="imgCon">
             <a class="thumbImage" rel="thumbs" title="${image.title?:''}" href="${image.largeImageUrl}" data-occurrenceuid="${image.occurrenceUid}"
-               id="thumb${status}"><img src="${image.smallImageUrl}" alt="${image.infoSourceName}"
-                                        alt="${image.title}" height="100px"
-                                        style="height:150px;padding-right:3px;"/>
+               id="thumb${status}"><img src="${image.smallImageUrl}" alt="${image.infoSourceName}"/>
                 <g:if test="${includeName}">
                     <div class="meta brief">
                         <bie:formatSciName name="${image.name}" rankId="${image.taxonRankID}"/>
-                        <g:if test="${image.type}"><br>Type: ${image.type}</g:if>
+                        <g:if test="${image.type}"><br>${image.type}</g:if>
+                        <g:if test="${image.institutionName}"> | ${image.institutionName}</g:if>
+                        <g:elseif test="${image.infoSourceName}"> | ${image.infoSourceName}</g:elseif>
+                    </div>
+                    <div class="meta detail hide">
+                        <bie:formatSciName name="${image.name}" rankId="${image.taxonRankID}"/>
                         <g:if test="${image.institutionName}"><br>${image.institutionName}</g:if>
                         <g:elseif test="${image.infoSourceName}"><br>${image.infoSourceName}</g:elseif>
+                        <g:if test="${image.type}"><br>Type: ${image.type}</g:if>
+                        <g:if test="${image.catalogNumber}"><br>Catalog: ${image.catalogNumber}</g:if>
+                        <g:if test="${image.eventDate}"><br>Date: <g:formatDate date="${image.eventDate}" format="yyyy-MM-dd"/></g:if>
                     </div>
                 </g:if>
                 <g:else>
                     <div class="meta brief">
-                        ${image.title} ${image.creator ? ' – ' + image.creator : ''}
+                        ${bie.formatSciName(name:image.name, rankId:image.taxonRankID)?:image.title} ${image.creator ? ' – ' + image.creator : ''}
+                    </div>
+                    <div class="meta detail hide">
+                        ${bie.formatSciName(name:image.name, rankId:image.taxonRankID)?:image.title}
+                        <g:if test="${image.creator}"><br>By: ${image.creator}</g:if>
+                        <g:if test="${image.institutionName}"><br>${image.institutionName}</g:if>
+                        <g:elseif test="${image.infoSourceName}"><br>${image.infoSourceName}</g:elseif>
+                        <g:if test="${image.catalogNumber}"><br>Catalog: ${image.catalogNumber}</g:if>
+                        <g:if test="${image.eventDate}"><br>Date: <g:formatDate date="${image.eventDate}" format="yyyy-MM-dd"/></g:if>
                     </div>
                 </g:else>
             </a>
