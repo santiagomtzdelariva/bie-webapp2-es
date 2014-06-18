@@ -67,7 +67,7 @@ grails.project.dependency.resolution = {
         //runtime ":yui-minify-resources:0.1.4"
         // Moved these plugins from application.properties file
         compile ':cache:1.0.1'
-        runtime ":cached-resources:1.1"
+        //runtime ":cached-resources:1.1"
         //runtime ":cache-headers:1.1.6"
         runtime ":rest:0.8"
 
