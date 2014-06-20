@@ -12,7 +12,8 @@ modules = {
 
     show {
         dependsOn 'colorbox, fancybox, cleanHtml, snazzy, bootstrap'
-        resource url:[dir:'css', file:'species.css', disposition: 'head']
+        resource url:[dir:'css', file:'species.css']
+        resource url:[dir:'css', file:'jquery.qtip.min.css']
         resource url:[dir:'js', file:'jquery.sortElemets.js', disposition: 'head']
         resource url:[dir:'js', file:'jquery.jsonp-2.3.1.min.js', disposition: 'head']
         resource url:[dir:'js', file:'trove.js', disposition: 'head']
@@ -20,6 +21,8 @@ modules = {
         resource url:[dir:'js', file:'charts2.js', disposition: 'head']
         resource url:[dir:'js', file:'species.show.js', disposition: 'head']
         resource url:[dir:'js', file:'audio.min.js', disposition: 'head']
+        resource url:[dir:'js', file:'jquery.qtip.min.js', disposition: 'head']
+        resource url:[dir:'js', file:'moment.min.js', disposition: 'head']
     }
 
     cleanHtml {

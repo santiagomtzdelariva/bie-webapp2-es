@@ -12,6 +12,12 @@
   - implied. See the License for the specific language governing
   - rights and limitations under the License.
   --}%
+
+%{--
+
+@deprecated - no longer used as images are now loaded via AJAX
+
+--}%
 <style type="text/css">
     .imgCon {
         display: inline-block;
@@ -50,18 +56,27 @@
         opacity: 0.7;
     }
 </style>
-<r:script disposition='head'>
+<r:script>
+
     $(document).ready(function() {
         // mouse over affect on thumbnail images
-        $('.imgCon').on('mouseenter', function() {
-            $(this).find('.brief').toggleClass('hide');
-            $(this).find('.detail').toggleClass('hide');
-        }).on('mouseleave', function() {
-            $(this).find('.brief').toggleClass('hide');
-            $(this).find('.detail').toggleClass('hide');
+        $('.imgCon').on('hover', function() {
+            $(this).find('.brief, .detail').toggleClass('hide');
         });
     });
+
+
 </r:script>
+<%-- template div used in AJAX --%>
+<div class="imgConTmpl hide">
+    <div class="imgCon">
+        <a class="thumbImage" rel="thumbs" href="" id="thumb">
+            <img src="" alt=""/>
+            <div class="meta brief"></div>
+            <div class="meta detail hide"></div>
+        </a>
+    </div>
+</div>
 <g:each var="image" in="${images}" status="status">
     <g:if test="${!image.isBlackListed}">
         <div class="imgCon">

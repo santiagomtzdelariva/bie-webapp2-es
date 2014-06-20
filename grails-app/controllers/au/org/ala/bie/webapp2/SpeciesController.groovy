@@ -98,8 +98,6 @@ class SpeciesController {
                 log.error "Error requesting taxon concept object: " + etc.error
                 render(view: '../error', model: [message: etc.error])
             } else {
-                Map<BiocacheService.ImageCategory, List> imageCategories = utilityService.splitImages(biocacheService.getSpeciesImages(etc))
-
                 render(view: 'show', model: [
                         tc: etc,
                         statusRegionMap: utilityService.getStatusRegionCodes(),
@@ -109,20 +107,14 @@ class SpeciesController {
                         isAustralian: bieService.getIsAustralian(etc.taxonConcept?.guid?:guid),
                         isRoleAdmin: authService.userInRole(grailsApplication.config.auth.admin_role),
                         userName: authService.email,
-                        typeImages: imageCategories.get(BiocacheService.ImageCategory.TYPE),
-                        specimenImages: imageCategories.get(BiocacheService.ImageCategory.SPECIMEN),
-                        otherImages: imageCategories.get(BiocacheService.ImageCategory.OTHER),
                         isReadOnly: grailsApplication.config.ranking.readonly, // TODO: implement this properly based on BIE version
                         sortCommonNameSources: utilityService.getNamesAsSortedMap(etc.commonNames),
                         taxonHierarchy: bieService.getClassificationForGuid(guid),
                         childConcepts: bieService.getChildConceptsForGuid(guid),
                         speciesList: bieService.getSpeciesList(etc.taxonConcept?.guid?:guid)
-                ]
-                )
+                ])
             }
         }
-
-
     }
 
     /**

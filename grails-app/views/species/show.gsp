@@ -440,28 +440,35 @@
                     </g:if>
                     </table>
                 </section><!--#overview-->
+                <!-- Gallery tab content -->
                 <g:if test="${tc.taxonConcept?.rankID?:0 >= 6000}">
                     <section class="tab-pane" id="gallery">
-                        <g:if test="${typeImages || otherImages || specimenImages}">
-                            <g:if test="${typeImages}">
-                                <h2>Type images</h2>
-                                <div id="typeGallery">
-                                    <g:render template="images" model="${[images: typeImages, includeName: true]}"/>
-                                </div>
-                            </g:if>
-                            <g:if test="${specimenImages}">
-                                <h2>Specimen images</h2>
-                                <div id="specimenGallery">
-                                    <g:render template="images" model="${[images: specimenImages, includeName: false]}"/>
-                                </div>
-                            </g:if>
-                            <g:if test="${otherImages}">
-                                <h2>Images</h2>
-                                <div id="otherGallery">
-                                    <g:render template="images" model="${[images: otherImages, includeName: false]}"/>
-                                </div>
-                            </g:if>
-                        </g:if>
+                        <%-- Gallery divs populated via AJAX --%>
+                        <div id="cat_type" class="hide">
+                            <h2>Type Images</h2>
+                            <div class="subGallery"></div>
+                        </div>
+                        <div id="cat_specimen" class="hide">
+                            <h2>Specimen Images</h2>
+                            <div class="subGallery"></div>
+                        </div>
+                        <div id="cat_other" class="hide">
+                            <h2>Images</h2>
+                            <div class="subGallery"></div>
+                        </div>
+                        <%-- template used by AJAX code --%>
+                        <div class="imgConTmpl hide">
+                            <div class="imgCon">
+                                <a class="cbLink" rel="thumbs" href="" id="thumb">
+                                    <img src="" alt="${tc?.taxonConcept?.nameString} image thumbnail"/>
+                                    <div class="meta brief"></div>
+                                    <div class="meta detail hide"></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div id="gallerySpinner" style="display: none;">
+                            Loading gallery <img src="${resource(dir: "images", file:"spinner.gif")}" />
+                        </div>
                         <g:if test="${tc.screenshotImages}">
                             <h2 style="margin-top:20px;">Videos</h2>
                             <div id="videosGallery">
@@ -500,11 +507,12 @@
                                 </g:each>
                             </div>
                         </g:if>
-                        <g:if test="${!tc.screenshotImages && !(typeImages || otherImages || specimenImages)}">
-                            <p>There are no images for this taxon</p>
-                        </g:if>
+                        %{--<g:if test="${!tc.screenshotImages && !(typeImages || otherImages || specimenImages)}">--}%
+                            %{--<p>There are no images for this taxon</p>--}%
+                        %{--</g:if>--}%
                     </section><!--#gallery-->
                 </g:if>
+
                 <section class="tab-pane" id="names">
                     <h2>Names and sources</h2>
                     <table class="table table-condensed">

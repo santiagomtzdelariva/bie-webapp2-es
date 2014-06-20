@@ -26,6 +26,24 @@
  * jQuery page onload callback
  */
 $(document).ready(function() {
+    var bhlInit = false;
+    var galleryInit = false;
+    $('a[data-toggle="tab"]').on('shown', function(e) {
+        //console.log("this", $(this).attr('id'));
+        var id = $(this).attr('id');
+        if (id == "t6" && !bhlInit) {
+            doBhlSearch(0, 10, false);
+            bhlInit = true;
+        } else if (id == "t2" && !galleryInit) {
+            loadGalleries();
+            galleryInit = true;
+        }
+        if (id != "t1") {
+            location.hash = 'tab_'+ $(e.target).attr('href').substr(1);
+        } else {
+            location.hash = '';
+        }
+    });
     //setup tabs
     if (location.hash !== '') {
         $('.nav-tabs a[href="' + location.hash.replace('tab_','') + '"]').tab('show');
@@ -40,70 +58,55 @@ $(document).ready(function() {
             $('.nav-tabs a:first').tab('show');
         }
     });
-    var bhlInit = false;
-    $('a[data-toggle="tab"]').on('shown', function(e) {
-        //console.log("this", $(this).attr('id'));
-        var id = $(this).attr('id');
-        if (id == "t6" && !bhlInit) {
-            doBhlSearch(0, 10, false);
-            bhlInit = true;
-        }
-        if (id != "t1") {
-            location.hash = 'tab_'+ $(e.target).attr('href').substr(1);
-        } else {
-            location.hash = '';
-        }
-    });
 
     // Gallery image popups using ColorBox
-    $("a.thumbImage").colorbox({
-        title: function() {
-            var titleBits = this.title.split("|");
-            return "<a href='"+titleBits[1]+"'>"+titleBits[0]+"</a>"; },
-        opacity: 0.5,
-        photo: true,
-        maxWidth: "80%",
-        maxHeight: "80%",
-        preloading: false,
-        onComplete: function() {
-            $("#cboxTitle").html(""); // Clear default title div
-            var index = $(this).attr('id').replace("thumb",""); // get the imdex of this image
-            var contentElement = $("div#thumbDiv"+index);
-            //console.log("index", index, "titleHtml", titleHtml);
-            // common code
-            function writeContent(el) {
-                var titleHtml = el.html(); // use index to load meta data
-                $("<div id='titleText'>"+titleHtml+"</div>").insertAfter("img.cboxPhoto");
-                $("div#titleText").css("padding-top","8px");
+    $('body').on('click', '.thumbImage', function() {
+        $("a.thumbImage").colorbox({
+            title: function () {
+                var titleBits = this.title.split("|");
+                return "<a href='" + titleBits[1] + "'>" + titleBits[0] + "</a>";
+            },
+            opacity: 0.5,
+            photo: true,
+            maxWidth: "80%",
+            maxHeight: "80%",
+            preloading: false,
+            onComplete: function () {
+                $("#cboxTitle").html(""); // Clear default title div
+                //console.log('colorbox onComplete', $(this));
+                var contentElement = $(this).find('.detail').clone();
+                var uuid = $(this).data('occurrenceuid');
+                $('#' + uuid).remove(); // clear previous data
+                var extraData = '<div class="rights">&nbsp;</div><div class="recordLink"><a href="http://biocache.ala.org.au/occurrences/' + uuid + '">View details of this record</a></div>';
+                contentElement.attr('id', $(this).data('id'));
+                contentElement.append(extraData);
+                //console.log("contentElement", contentElement.html(), uuid);
+                var titleHtml = contentElement.html(); // use index to load meta data
+                $("<div class='titleText' id='" + uuid + "'>" + titleHtml + "</div>").insertAfter("img.cboxPhoto");
+                $("div.titleText").css("padding-top", "8px");
                 var cbox = $.fn.colorbox;
-                if ( cbox != undefined){
+                if (cbox != undefined) {
                     cbox.resize();
                 }
-            }
 
-            // load extra data via JSON GET
-            var occurrenceUid = $(this).data('occurrenceuid'); // always lower case
-            if (occurrenceUid) {
-                var url = SHOW_CONF.biocacheUrl + "/ws/occurrences/" + occurrenceUid + ".json?callback=?";
-                //console.log('occurrenceUid', occurrenceUid, url);
-                $.ajax({
-                    url: url,
-                    dataType: "jsonp",
-                    async: false
-                }).done(function(data) {
-                    //console.log('data.raw', data.raw);
-                    if (data.raw && data.raw.occurrence && data.raw.occurrence.rights) {
-                        //console.log('rights', data.raw.occurrence.rights, contentElement.find('.imageMetadataField.rights').text());
-                        contentElement.find('.imageMetadataField.rights').removeClass('hide');
-                        contentElement.find('.imageRights').html(data.raw.occurrence.rights);
-                    }
-
-                    writeContent(contentElement);
-                });
-            } else {
-                writeContent(contentElement);
+                // load extra data via JSON GET
+                if (uuid) {
+                    var url = SHOW_CONF.biocacheUrl + "/ws/occurrences/" + uuid + ".json?callback=?";
+                    //console.log('occurrenceUid', occurrenceUid, url);
+                    $.ajax({
+                        url: url,
+                        dataType: "jsonp",
+                        async: false
+                    }).done(function (data) {
+                        //console.log('data.raw', data.raw);
+                        if (data.raw && data.raw.occurrence && data.raw.occurrence.rights) {
+                            //console.log('rights', data.raw.occurrence.rights, $('#' + uuid).html());
+                            $('#' + uuid).find('.rights').html('Rights: ' + data.raw.occurrence.rights);
+                        }
+                    });
+                }
             }
-        }
+        });
     });
 
     // LSID link to show popup with LSID info and links
@@ -165,15 +168,115 @@ $(document).ready(function() {
     $(".thumbImageBrowse").tooltip();
     $(".col-narrow a").tooltip({ position: "bottom right", offset: [0, -20], opacity: 0.9});
 
+    // mouse over affect on thumbnail images
+    $('#gallery').on('hover', '.imgCon', function() {
+        $(this).find('.brief, .detail').toggleClass('hide');
+    });
+
     // add expert distrobution map
     addExpertDistroMap();
 
     //Trove search results
     setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
+
 }); // end document.ready
 
 function chartsError() {
     $("#chartsError").html("An error occurred and charts cannot be displayed at this time.");
+}
+
+/**
+ * Trigger loading of the 3 gallery sections
+ */
+function loadGalleries() {
+    //alert('loading galleries');
+    $('#gallerySpinner').show();
+    loadGalleryType('type', 0)
+    loadGalleryType('specimen', 0)
+    loadGalleryType('other', 0)
+}
+
+/**
+ * AJAX loading of gallery images from biocache-service
+ *
+ * @param category
+ * @param start
+ */
+function loadGalleryType(category, start) {
+    // type: &fq=multimedia:"Image"&fq=type_status:*&pageSize=100&facet=off
+    // specimen: &fq=multimedia:"Image"&fq=basis_of_record:PreservedSpecimen&fq=-type_status:*&pageSize=100&facet=off
+    // other: &fq=multimedia:"Image"&fq=-type_status:*&fq=-basis_of_record:PreservedSpecimen&pageSize=100&facet=off
+
+    var imageCategoryParams = {
+        type: '&fq=type_status:*',
+        specimen: '&fq=basis_of_record:PreservedSpecimen&fq=-type_status:*',
+        other: '&fq=-type_status:*&fq=-basis_of_record:PreservedSpecimen'
+    };
+    var pageSize = 20;
+
+    if (start > 0) {
+        $('.loadMore.' + category + ' button').addClass('disabled');
+        $('.loadMore.' + category + ' img').removeClass('hide');
+    }
+
+    var url = SHOW_CONF.biocacheUrl  + '/ws/occurrences/search.json?q=lsid:' + SHOW_CONF.guid
+        + '&fq=multimedia:"Image"&pageSize=' + pageSize + '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
+
+    $.getJSON(url, function(data){
+        if (data && data.totalRecords > 0) {
+            var br = "<br>";
+            var $categoryTmpl = $('#cat_' + category);
+            $categoryTmpl.removeClass('hide');
+
+            $.each(data.occurrences, function(i, el) {
+                // clone template div & populate with metadata
+                var $ImgConTmpl = $('.imgConTmpl').clone();
+                $ImgConTmpl.removeClass('imgConTmpl').removeClass('hide');
+                var link = $ImgConTmpl.find('a.cbLink')
+                link.attr('id','thumb_' + category + i);
+                link.addClass('thumbImage tooltips');
+                link.attr('href', el.largeImageUrl);
+                link.attr('title', 'click to enlarge');
+                link.attr('data-id', category + i);
+                link.attr('data-occurrenceuid', el.uuid);
+                link.attr('data-category', category);
+                $ImgConTmpl.find('img').attr('src', el.smallImageUrl);
+                // brief metadata
+                var briefHtml = el.raw_scientificName;
+                if (el.typeStatus) briefHtml += br + el.typeStatus;
+                if (el.institutionName) briefHtml += ((el.typeStatus) ? ' | ' : br) + el.institutionName;
+                $ImgConTmpl.find('.brief').html(briefHtml);
+                // detail metadata
+                var detailHtml = el.raw_scientificName;
+                if (el.typeStatus) detailHtml += br + 'Type: ' + el.typeStatus;
+                if (el.collector) detailHtml += br + 'By: ' + el.collector;
+                if (el.eventDate) detailHtml += br + 'Date: ' + moment(el.eventDate).format('YYYY-MM-DD');
+                if (el.institutionName) {
+                    detailHtml += br + el.institutionName;
+                } else {
+                    detailHtml += br + el.dataResourceName;
+                }
+
+                // write to DOM
+                $ImgConTmpl.find('.detail').html(detailHtml);
+                $categoryTmpl.find('.subGallery').append($ImgConTmpl.html());
+            });
+
+            $('.loadMore.' + category).remove(); // remove 'load more images' button that was just clicked
+
+            if (data.totalRecords > (start + pageSize)) {
+                // add new 'load more images' button if required
+                var spinnerLink = $('#gallerySpinner img').attr('src');
+                var btn = '<div class="loadMore ' + category + '"><br><button class="btn" onCLick="loadGalleryType(\'' + category + '\','
+                    + (start + pageSize)  + ');">Load more images <img src="' + spinnerLink + '" class="hide"/></button></div>';
+                $categoryTmpl.find('.subGallery').append(btn);
+            }
+        }
+    }).fail(function(jqxhr, textStatus, error) {
+        alert('Error loading gallery: ' + textStatus + ', ' + error);
+    }).always(function() {
+        $('#gallerySpinner').hide();
+    });
 }
 
 /**

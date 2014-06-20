@@ -81,7 +81,7 @@ function queryTrove(){
                         buff +=  '<p class="contributors">Contributors: ';
                         var contribIdx = 0;
                         $.each(value.contributor, function(ci, cv){
-                          console.log('contributor: ' + cv);
+                          //console.log('contributor: ' + cv);
                           if(contribIdx>0){
                             buff += '; ';
                           }

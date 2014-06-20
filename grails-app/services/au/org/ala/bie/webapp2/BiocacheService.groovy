@@ -17,6 +17,11 @@ class BiocacheService {
         }
     }
 
+    /**
+     * @deprecated - done via AJAX now
+     * @param etc
+     * @return
+     */
     def getSpeciesImages(etc) {
         def guid = etc.taxonConcept?.guid?:guid
         def defaultTitle = etc.taxonConcept?.nameString
