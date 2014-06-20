@@ -97,7 +97,7 @@
 
             if (data.results.length > 0) {
                 $.each(data.results, function(i, el) {
-                    console.log('el', i, el);
+                    //console.log('el', i, el);
                     var scientificName = (el.nameComplete) ? "<i>" + el.nameComplete + "</i>" : "";
                     var commonName = (el.commonNameSingle) ? el.commonNameSingle + "<br/> " : "";
                     var imageUrl = el.thumbnail;
