@@ -12,7 +12,7 @@
 
     <title><g:layoutTitle /></title>
 
-    <%-- Do not include JS & CSS files here - add them to your app's "application" module (in "Configuration/ApplicationResources.groovy") --%>
+<%-- Do not include JS & CSS files here - add them to your app's "application" module (in "Configuration/ApplicationResources.groovy") --%>
     <r:require modules="bootstrap, application"/>
 
     <r:script disposition='head'>
@@ -67,19 +67,18 @@
     <g:layoutHead />
 </head>
 <body class="${pageProperty(name:'body.class')?:'nav-species'}" id="${pageProperty(name:'body.id')}" onload="${pageProperty(name:'body.onload')}">
+<g:set var="fluidLayout" value="${pageProperty(name:'meta.fluidLayout')?:grailsApplication.config.skin?.fluidLayout}"/>
+<hf:banner logoutUrl="${g.createLink(controller:"logout", action:"logout", absolute: true)}" fluidLayout="${fluidLayout}"/>
 
-<hf:banner logoutUrl="${grailsApplication.config.grails.serverURL}/logout/logout"/>
+<hf:menu fluidLayout="${fluidLayout}"/>
 
-<hf:menu/>
-
-<div class="container" id="main-content">
+<div class="${fluidLayout?'container-fluid':'container'}" id="main-content">
     <g:layoutBody />
 </div><!--/.container-->
 
-<div class="container hidden-desktop">
+<div class="${fluidLayout?'container-fluid':'container'} hidden-desktop">
     <%-- Borrowed from http://marcusasplund.com/optout/ --%>
     <a class="btn btn-small toggleResponsive"><i class="icon-resize-full"></i> <span>Desktop</span> version</a>
-    %{--<a class="btn btn-small toggleResponsive"><i class="icon-resize-full"></i> Desktop version</a>--}%
 </div>
 
 <hf:footer/>

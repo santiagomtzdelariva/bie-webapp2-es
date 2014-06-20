@@ -26,6 +26,7 @@
 <head>
     <title><g:if test="${params.scientificName}">${params.taxonRank}  ${params.scientificName} | </g:if> Image browser | Atlas of Living Australia</title>
     <meta name="layout" content="main" />
+    <meta name="fluidLayout" content="${true}" />
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'colorbox.css')}" type="text/css" media="screen" />
     <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.colorbox-min.js')}"></script>
     <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.tools.min.js')}"></script>
@@ -60,6 +61,11 @@
                 imageLoad();
             });
 
+            // mouse over affect on thumbnail images
+            $('#imageResults').on('hover', '.imgCon', function() {
+                $(this).find('.brief, .detail').toggleClass('hide');
+            });
+
         });
 
         function imageLoad() {
@@ -91,6 +97,7 @@
 
             if (data.results.length > 0) {
                 $.each(data.results, function(i, el) {
+                    console.log('el', i, el);
                     var scientificName = (el.nameComplete) ? "<i>" + el.nameComplete + "</i>" : "";
                     var commonName = (el.commonNameSingle) ? el.commonNameSingle + "<br/> " : "";
                     var imageUrl = el.thumbnail;
@@ -98,11 +105,22 @@
                     if (imageUrl) {
                         imageUrl = imageUrl.replace('thumbnail', 'smallRaw');
                     }
-                    var content = '<div class="imgContainer"><a href="${grailsApplication.config.grails.serverURL}/species/' + el.guid;
-                    content +=  '" class="thumbImage" title="' + titleText + '">';
-                    content += '<img src="' + imageUrl + '" class="searchImage" style="max-height:150px;"/><br/>';
-                    content += commonName + scientificName + '</a></div>';
-                    $("#imageResults").append(content);
+                    var $ImgCon = $('.imgConTmpl').clone();
+                    $ImgCon.removeClass('imgConTmpl').removeClass('hide');
+                    var link = $ImgCon.find('a.thumbImage');
+                    link.attr('href', '${grailsApplication.config.grails.serverURL}/species/' + el.guid);
+                    link.attr('title', titleText);
+                    $ImgCon.find('img').attr('src', imageUrl);
+                    $ImgCon.find('.brief').html(commonName + scientificName);
+
+                    var detail = scientificName + " " + el.author;
+                    if (el.commonNameSingle) detail += "<br>" + el.commonNameSingle;
+                    if (el.family)  detail += "<br>Family: " + el.family;
+                    if (el.order)  detail += "<br>Order: " + el.order;
+                    if (el.class)  detail += "<br>Class: " + el.class;
+                    $ImgCon.find('.detail').html(detail);
+
+                    $("#imageResults").append($ImgCon.html());
                 });
                 // add delay for trigger div
                 $("#loadMoreTrigger").delay(500).show();
@@ -129,6 +147,7 @@
     }
 
     #imageResults {
+        margin-top: 20px;
         margin-bottom: 30px;
     }
 
@@ -172,6 +191,43 @@
         text-align: center;
     }
 
+    .imgCon {
+        display: inline-block;
+        /* margin-right: 8px; */
+        text-align: center;
+        line-height: 1.3em;
+        background-color: #DDD;
+        color: #DDD;
+        font-size: 12px;
+        /*text-shadow: 2px 2px 6px rgba(255, 255, 255, 1);*/
+        /* padding: 5px; */
+        /* margin-bottom: 8px; */
+        margin: 2px 0 2px 0;
+        position: relative;
+    }
+    .imgCon img {
+        height: 150px;
+    }
+    .imgCon .meta {
+        opacity: 0.8;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        overflow: hidden;
+        text-align: left;
+        padding: 4px 5px 2px 5px;
+    }
+    .imgCon .brief {
+        color: black;
+        background-color: white;
+    }
+    .imgCon .detail {
+        color: white;
+        background-color: black;
+        opacity: 0.7;
+    }
+
     </style>
 </head>
 <body class="nav-species fluid">
@@ -191,6 +247,17 @@
         </div>
     </header>
     <div class="inner">
+        <%-- template used by AJAX code --%>
+        <div class="imgConTmpl hide">
+            <div class="imgCon">
+                <a class="thumbImage" rel="thumbs" href="" id="thumb">
+                    <img src="" class="searchImage" alt="${params.scientificName} image thumbnail"/>
+                    <div class="meta brief"></div>
+                    <div class="meta detail hide"></div>
+                </a>
+            </div>
+        </div>
+
         <div id="imageResults">
             <!-- image objects get inserted here by JS -->
         </div>
