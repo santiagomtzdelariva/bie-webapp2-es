@@ -206,7 +206,7 @@
         position: relative;
     }
     .imgCon img {
-        height: 150px;
+        height: 200px;
     }
     .imgCon .meta {
         opacity: 0.8;
