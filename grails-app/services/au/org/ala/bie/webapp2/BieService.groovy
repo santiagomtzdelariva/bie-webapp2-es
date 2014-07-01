@@ -94,7 +94,7 @@ class BieService {
             return null
         }
         try{
-            def json = webService.get(grailsApplication.config.speciesList.baseURL + "/ws/species/" + guid.replaceAll(/\s+/,'+'), true)
+            def json = webService.get(grailsApplication.config.speciesList.baseURL + "/ws/species/" + guid.replaceAll(/\s+/,'+') + "?isBIE=true", true)
             return JSON.parse(json)
         }
         catch(Exception e){
