@@ -49,11 +49,23 @@ var baseFacetChart = {
         state: {ignore: ['Unknown1']},
         type_status: {title: 'By type status (as % of all type specimens)', ignore: ['notatype']},
         el895: {hAxis: {title:'Moisture Index'}},
-        el882: {hAxis: {title:'mm'}},
+        el882: {hAxis: {title:'mm'}, chartArea: {width: "65%"}},
         el889: {hAxis: {title:'mm'}},
         el887: {hAxis: {title:'MJ/m2/day'}},
         el865: {hAxis: {title:'Moisture Index'}},
         el894: {hAxis: {title:'MJ/m2/day'}},
+        el895Outliers: {hAxis: {title:'Moisture Index'}, chartArea: {width: "65%"}, facets: ['el895'], facetLabels: ['Precipitation'], singleFacetName : 'el895', avoidTitlePrefix:true},
+        el882Outliers: {hAxis: {title:'mm'}, chartType: "scatter", chartArea: {width: "65%"}, facets: ['el882'], facetLabels: ['Precipitation'], singleFacetName : 'el882', avoidTitlePrefix:true},
+        el889Outliers: {hAxis: {title:'mm'}, chartArea: {width: "65%"}, facets: ['el889'], facetLabels: ['Precipitation'], singleFacetName : 'el889', avoidTitlePrefix:true},
+        el887Outliers: {hAxis: {title:'MJ/m2/day'}, chartArea: {width: "65%"}, facets: ['el887'], facetLabels: ['Precipitation'], singleFacetName : 'el887', avoidTitlePrefix:true},
+        el865Outliers: {hAxis: {title:'Moisture Index'}, chartArea: {width: "65%"}, facets: ['el865'], facetLabels: ['Precipitation'], singleFacetName : 'el865', avoidTitlePrefix:true},
+        el894Outliers: {hAxis: {title:'MJ/m2/day'}, chartArea: {width: "65%"}, facets: ['el894'], facetLabels: ['Precipitation'], singleFacetName : 'el894', avoidTitlePrefix:true},
+        el895OutliersCumm: {hAxis: {title:'Moisture Index'}, chartArea: {width: "65%"}, facets: ['el895'], facetLabels: ['Precipitation'], singleFacetName : 'el895', avoidTitlePrefix:true},
+        el882OutliersCumm: {hAxis: {title:'mm'}, chartArea: {width: "65%"}, facets: ['el882'], facetLabels: ['Precipitation'], singleFacetName : 'el882', avoidTitlePrefix:true},
+        el889OutliersCumm: {hAxis: {title:'mm'}, chartArea: {width: "65%"}, facets: ['el889'], facetLabels: ['Precipitation'], singleFacetName : 'el889', avoidTitlePrefix:true},
+        el887OutliersCumm: {hAxis: {title:'MJ/m2/day'}, chartArea: {width: "65%"}, facets: ['el887'], facetLabels: ['Precipitation'], singleFacetName : 'el887', avoidTitlePrefix:true},
+        el865OutliersCumm: {hAxis: {title:'Moisture Index'}, chartArea: {width: "65%"}, facets: ['el865'], facetLabels: ['Precipitation'], singleFacetName : 'el865', avoidTitlePrefix:true},
+        el894OutliersCumm: {hAxis: {title:'MJ/m2/day'}, chartArea: {width: "65%"}, facets: ['el894'], facetLabels: ['Precipitation'], singleFacetName : 'el894', avoidTitlePrefix:true},
         radiation: {hAxis: {title:'MJ/m2/day'}, chartArea: {width: "65%"}, facets: ['el887','el894'],
             facetLabels: ['seasonality (Bio23)','warmest quarter (Bio26)']},
         precipitation: {hAxis: {title:'mm'}, chartArea: {width: "65%"}, facets: ['el882','el889'],
@@ -76,11 +88,23 @@ var baseFacetChart = {
         biogeographic_region: 'biogeographic region',
         occurrence_year: 'decade',
         el895: 'Moisture Index - lowest period (Bio30)',
+        el895Outliers: 'Moisture Index - lowest period (Bio30)',
+        el895OutliersCumm: 'Moisture Index - lowest period (Bio30)',
         el882: 'Precipitation - seasonality (Bio15)',
+        el882Outliers: 'Precipitation - seasonality (Bio15) - Outliers',
+        el882OutliersCumm: 'Precipitation - seasonality (Bio15) - Outliers (Cumulative)',
         el889: 'Precipitation - driest quarter (Bio17)',
+        el889Outliers: 'Precipitation - driest quarter (Bio17) - Outliers',
+        el889OutliersCumm: 'Precipitation - driest quarter (Bio17) - Outliers (Cumulative)',
         el887: 'Radiation - seasonality (Bio23)',
+        el887Outliers: 'Radiation - seasonality (Bio23) - Outliers',
+        el887OutliersCumm: 'Radiation - seasonality (Bio23) - Outliers (Cumulative)',
         el865: 'Moisture Index - highest quarter mean (Bio32)',
+        el865Outliers: 'Moisture Index - highest quarter mean (Bio32) - Outliers',
+        el865OutliersCumm: 'Moisture Index - highest quarter mean (Bio32) - Outliers (Cumulative)',
         el894: 'Radiation - warmest quarter (Bio26)',
+        el894Outliers: 'Radiation - warmest quarter (Bio26) - Outliers',
+        el894OutliersCumm: 'Radiation - warmest quarter (Bio26) - Outliers (Cumulative)',
         radiation: 'Radiation',
         precipitation: 'Precipitation',
         moisture: 'Moisture'
@@ -169,13 +193,7 @@ var baseFacetChart = {
     },
     labelFormatters: {
         month: function (data) {
-            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-                monthIdx;
-            $.each(data, function(i,obj) {
-                monthIdx = obj.label;
-                obj.formattedLabel = months[monthIdx - 1];
-            });
-            return data;
+            return transformMonthData(data);
         }
     },
     transformDataAfter: function (dataTable, opts) {
@@ -198,7 +216,11 @@ var baseFacetChart = {
             specificOptions = options[name];
 
         // add the default title
-        this.title = "By " + this.chartLabel();
+        if(options.avoidTitlePrefix !== "undefined" && options.avoidTitlePrefix){
+            this.title =  this.chartLabel();
+        } else {
+            this.title = "By " + this.chartLabel();
+        }
 
         // apply chart-specific and user-defined options and user-defined individual chart options
         var opts = $.extend(true, {}, this.getChartTypeOptions(name), options, options[name] || {});
@@ -227,7 +249,7 @@ var baseFacetChart = {
         var that = this;
 
         // build the table
-        var dataTable = this.buildDataTable(name, data);
+        var dataTable = this.buildDataTable(name, data, options);
 
         // reject the chart if there is only one facet value (after filtering)
         if (dataTable.getNumberOfRows() < 2) {
@@ -278,44 +300,58 @@ var baseFacetChart = {
                         var decade = id.substr(0,4);
                         var dateTo = parseInt(decade) + 9;
                         facetQuery = "occurrence_year:[" + decade + "-01-01T00:00:00Z%20TO%20" +
-                                dateTo + "-12-31T23:59:59Z]";
+                            dateTo + "-12-31T23:59:59Z]";
                     }
                 }
 
                 // show the records
                 document.location = urlConcat(biocacheWebappUrl,"/occurrences/search?q=") + that.query +
-                        "&fq=" + facetQuery;
+                    "&fq=" + facetQuery;
             });
         }
     },
-    buildDataTable: function (name, data) {
+    buildDataTable: function (name, data, options) {
         this.column1DataType = this.column1 || 'string';
 
         // preserve context for callback
         var that = this;
 
         // deduce the fieldName used in the data
-        var fieldName = this.getChartTypeOptions(name).responseFacetName || name;
+        //var fieldName = this.getChartTypeOptions(name).responseFacetName || name;
 
         // optionally transform the data
-        var xformedData = this.transformData(data[fieldName]);
+        var facetData = data[name];
+        if(that.singleFacetName !== "undefined" && that.singleFacetName != null){
+            //console.log('########Transform data using singleFacetName : ' + that.singleFacetName );
+            facetData = data[that.singleFacetName];
+        }
+
+        var xformedData = this.transformData(facetData);
 
         // optionally format the labels
         xformedData = this.formatLabel(xformedData);
 
         // create the data table
         var dataTable = new google.visualization.DataTable(), dataOptions = this.getChartTypeOptions(name);
-        if (dataOptions && dataOptions.facets) {
+        if (dataOptions && dataOptions.facets && options.outlierValues == "undefined") {
             // add a y-value column for each facet
             dataTable.addColumn(this.column1DataType, this.chartLabel());
             for (var i = 0; i < dataOptions.facets.length; i++) {
                 dataTable.addColumn('number', dataOptions.facetLabels ? dataOptions.facetLabels[i] : this.chartLabel());
             }
-        }
-        else if (this.column1DataType == 'number') {
+        } else if (options.outlierValues !== undefined) {
             dataTable.addColumn('number', this.chartLabel());
             dataTable.addColumn('number','records');
+            dataTable.addColumn('number','outliers');
+            dataTable.addColumn('number','this record (outlier)');
+
+        } else if (this.column1DataType == 'number') {
+            //console.log('building datatable "number" ');
+            dataTable.addColumn('number', this.chartLabel());
+            dataTable.addColumn('number','records');
+
         } else {
+            //console.log('building datatable else ');
             dataTable.addColumn('string', this.chartLabel());
             dataTable.addColumn('number','records');
         }
@@ -323,9 +359,9 @@ var baseFacetChart = {
         if (dataOptions && dataOptions.facets && dataOptions.facets.length > 1) {
             // munge data from 2 facets TODO: only handles 2 facets here
             var facet1 = data[dataOptions.facets[0]],
-                    facet2 = data[dataOptions.facets[1]],
-                    xValue,
-                    rowIndexes;
+                facet2 = data[dataOptions.facets[1]],
+                xValue,
+                rowIndexes;
 
             $.each(facet1, function (i,obj) {
                 dataTable.addRow([parseFloat(obj.label), obj.count, null]);
@@ -340,6 +376,37 @@ var baseFacetChart = {
                 } else {
                     // create a new row with null as the first value
                     dataTable.addRow([parseFloat(obj.label), null, obj.count]);
+                }
+            });
+
+        } else if(options.outlierValues !== undefined) {
+
+            //console.log('building datatable -  handle each data item');
+            // handle each data item
+            // //console.log('xformedData : ' + xformedData);
+
+            $.each(xformedData, function(i,obj) {
+                // filter any crap
+                //console.log('building datatable -  obj.label: ' + obj.label);
+                if (that.ignore !== "undefined" || $.inArray(obj.label, that.ignore) == -1) {
+                    //console.log('building datatable -  crap filtered');
+
+                    if (detectCamelCase(obj.label)) {
+                        dataTable.addRow([{v: obj.label, f: capitalise(expandCamelCase(obj.label))}, obj.count, null,null]);
+                    } else if (that.column1DataType === 'number') {
+
+                        ////console.log('inArray: ' + $.inArray(obj.label, options.outlierValues));
+
+                        if (options.highlightedValue !== undefined && obj.label == options.highlightedValue){
+                            dataTable.addRow([parseFloat(obj.label), null, null, obj.count]);
+                        } else if($.inArray(parseFloat(obj.label), options.outlierValues) >= 0){
+                            dataTable.addRow([parseFloat(obj.label), null, obj.count, null]);
+                        } else {
+                            dataTable.addRow([parseFloat(obj.label), obj.count, null,null])
+                        }
+                    } else {
+                        dataTable.addRow([parseFloat(obj.label), obj.count, null,null]);
+                    }
                 }
             });
 
@@ -437,10 +504,20 @@ var defaultChartTypes = {
     state_conservation: 'column',
     el895: 'scatter',
     el882: 'scatter',
+    el882OutliersCumm: 'scatter',
+    el882Outliers: 'scatter',
     el887: 'scatter',
+    el887Outliers: 'scatter',
+    el887OutliersCumm: 'scatter',
     el889: 'scatter',
+    el889Outliers: 'scatter',
+    el889OutliersCumm: 'scatter',
     el865: 'scatter',
+    el865Outliers: 'scatter',
+    el865OutliersCumm: 'scatter',
     el894: 'scatter',
+    el894Outliers: 'scatter',
+    el894OutliersCumm: 'scatter',
     radiation: 'scatter',
     precipitation: 'scatter',
     moisture: 'scatter'
@@ -452,8 +529,8 @@ var facetChartGroup = {
     createChart: function (name, options, data) {
         // choose a chart type to instantiate
         var baseChart = (options[name] && options[name].chartType) ?
-                options[name].chartType :
-                (defaultChartTypes[name] || 'pie');
+            options[name].chartType :
+            (defaultChartTypes[name] || 'pie');
 
         var that = facetChartTypes[baseChart]();
 
@@ -482,13 +559,13 @@ var facetChartGroup = {
         // the base url for getting the facet data
         var url = (options.biocacheServicesUrl == undefined) ? baseFacetChart.biocacheServicesUrl : options.biocacheServicesUrl,
 
-                facets = "",
+            facets = "",
 
-            // calc the target div
-                chartsDiv = $('#' + (options.chartsDiv ? options.chartsDiv : baseFacetChart.chartsDiv)),
+        // calc the target div
+            chartsDiv = $('#' + (options.chartsDiv ? options.chartsDiv : baseFacetChart.chartsDiv)),
 
-            // reference to this that we can use in callbacks
-                that = this;
+        // reference to this that we can use in callbacks
+            that = this;
 
         // build facets list
         $.each(options.charts, function(i,name) {
@@ -528,7 +605,19 @@ var facetChartGroup = {
             $(options.totalRecordsSelector).html(addCommas(data.totalRecords));
         }
 
-        // transform facet results list into map keyed on field name (the facet name in the data)
+        //if the chart is Cumulative, keep a running total
+        if(options.cumulative !== undefined && options.cumulative){
+            var runningTotal = 0;
+            for(var i = 0; i < data.facetResults[0].fieldResult.length; i++){
+
+                runningTotal += data.facetResults[0].fieldResult[i].count;
+                data.facetResults[0].fieldResult[i].count = runningTotal;
+
+                //console.log(data.facetResults[0].fieldResult[i].label +": total, " + runningTotal);
+            }
+        }
+
+        // transform facet results list into map keyed on facet name
         var facetMap = {};
         $.each(data.facetResults, function(idx, obj) {
             facetMap[obj.fieldName] = obj.fieldResult;
@@ -536,8 +625,8 @@ var facetChartGroup = {
 
         // draw the charts
         var chartsDiv = $('#' + (options.targetDivId ? options.targetDivId : 'charts')),
-                query = options.query,
-                that = this;
+            query = options.query,
+            that = this;
         $.each(options.charts, function(index, name) {
             that.createChart(name, options, facetMap);
         });
@@ -549,11 +638,11 @@ var loadAndDrawFacetCharts = function (options) {
     // the base url for getting the facet data
     var url = (options.biocacheServicesUrl == undefined) ? baseFacetChart.biocacheServicesUrl : options.biocacheServicesUrl,
 
-        // build the required facet set
-            facets = options.charts.join('&facets='),
+    // build the required facet set
+        facets = options.charts.join('&facets='),
 
-        // calc the target div
-            chartsDiv = $('#' + (options.chartsDiv ? options.chartsDiv : baseFacetChart.chartsDiv));
+    // calc the target div
+        chartsDiv = $('#' + (options.chartsDiv ? options.chartsDiv : baseFacetChart.chartsDiv));
 
     // show a message while requesting data
     chartsDiv.append($("<span>Loading charts...</span>"));
@@ -634,12 +723,18 @@ var chartLabels = {
 // asynchronous transforms are applied after the chart is drawn, ie the chart is drawn with the original values
 // then redrawn when the ajax call for transform data returns
 var asyncTransforms = {
-    institution_uid: {method: 'lookupEntityName', param: 'institution'},
-    data_resource_uid: {method: 'lookupEntityName', param: 'dataResource'}
+// facet data now has entitiy names in label
+//    collection_uid: {method: 'lookupEntityName', param: 'collection'},
+//    institution_uid: {method: 'lookupEntityName', param: 'institution'},
+//    data_resource_uid: {method: 'lookupEntityName', param: 'dataResource'}
 }
 // synchronous transforms are applied to the json data before the data table is built
 var syncTransforms = {
-    occurrence_year: {method: 'transformDecadeData'}/*,
+    collection_uid: {method: 'transformFqData'},
+    institution_uid: {method: 'transformFqData'},
+    data_resource_uid: {method: 'transformFqData'},
+    occurrence_year: {method: 'transformDecadeData'},
+    month: {method: 'transformMonthData'}/*,
      assertions: {method: 'expandCamelCase'}*/
 }
 
@@ -739,6 +834,9 @@ function buildGenericFacetChart(name, data, query, chartsDiv, chartOptions) {
             if (detectCamelCase(obj.label)) {
                 dataTable.addRow([{v: obj.label, f: capitalise(expandCamelCase(obj.label))}, obj.count]);
             }
+            else if (obj.formattedLabel) {
+                dataTable.addRow([{v: obj.label, f: obj.formattedLabel}, obj.count]);
+            }
             else {
                 dataTable.addRow([obj.label, obj.count]);
             }
@@ -783,7 +881,15 @@ function buildGenericFacetChart(name, data, query, chartsDiv, chartOptions) {
             var id = dataTable.getValue(chart.getSelection()[0].row,0);
 
             // build the facet query
-            var facetQuery = name + ":" + id;
+            //var facetQuery = name + ":" + id;
+            var facetQuery;
+
+            if (id.indexOf(name) != -1) {
+                // fq provided in facet results
+                facetQuery = id;
+            } else {
+                facetQuery = name + ":" + id;
+            }
 
             // the facet query can be overridden for date ranges
             if (name == 'occurrence_year') {
@@ -799,7 +905,7 @@ function buildGenericFacetChart(name, data, query, chartsDiv, chartOptions) {
 
             // show the records
             document.location = urlConcat(biocacheWebappUrl,"/occurrences/search?q=") + query +
-                    "&fq=" + facetQuery;
+                "&fq=" + facetQuery;
         });
     }
 }
@@ -819,6 +925,25 @@ function transformDecadeData(data) {
         }
     });
     return transformedData;
+}
+function transformMonthData(data) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        monthIdx;
+    $.each(data, function(i,obj) {
+        monthIdx = parseInt(obj.label, 10); // months values "01" need parsing to int
+        obj.formattedLabel = months[monthIdx - 1];
+    });
+    return data;
+}
+function transformFqData(data) {
+    $.each(data, function(i,obj) {
+        // substitute label for fq data if present
+        if (obj.fq) {
+            obj.formattedLabel = obj.label;
+            obj.label = obj.fq;
+        }
+    });
+    return data;
 }
 /*--------------------- LABEL TRANSFORMATION METHODS ----------------------*/
 function detectCamelCase(name) {
@@ -1015,7 +1140,7 @@ var taxonomyChart = {
 
                 // show spinner while loading
                 $container.append($('<img class="loading" style="position:absolute;left:130px;top:220px;z-index:2000" ' +
-                        'alt="loading..." src="' + collectionsUrl + '/images/ala/ajax-loader.gif"/>'));
+                    'alt="loading..." src="' + collectionsUrl + '/images/ala/ajax-loader.gif"/>'));
 
                 // get state from history
                 var previous = thisChart.popState();
@@ -1068,7 +1193,7 @@ var taxonomyChart = {
                 if (drillDown && data.rank != "species") {
                     // show spinner while loading
                     $container.append($('<img class="loading" style="position:absolute;left:130px;top:220px;z-index:2000" ' +
-                            'alt="loading..." src="' + collectionsUrl + '/images/ala/ajax-loader.gif"/>'));
+                        'alt="loading..." src="' + collectionsUrl + '/images/ala/ajax-loader.gif"/>'));
 
                     // save current state as history - for back-tracking
                     thisChart.pushState();
@@ -1085,7 +1210,7 @@ var taxonomyChart = {
                 else if (clickThru) {
                     // show occurrence records
                     document.location = urlConcat(biocacheWebappUrl, "/occurrences/search?q=") + query +
-                            "&fq=" + data.rank + ":" + name;
+                        "&fq=" + data.rank + ":" + name;
                 }
             });
         }
@@ -1097,7 +1222,7 @@ var taxonomyChart = {
             fq = "&fq=" + this.rank + ":" + this.name;
         }
         document.location = urlConcat(biocacheWebappUrl, "/occurrences/search?q=") +
-                this.query + fq;
+            this.query + fq;
     },
     reset: function () {
         if (this.hasState()) {
@@ -1140,80 +1265,80 @@ function initTaxonTree(treeOptions) {
     });
     var $tree = $('<div id="taxaTree"></div>').appendTo($treeContainer);
     $tree
-            .bind("after_open.jstree", function(event, data) {
-        var children = $.jstree._reference(data.rslt.obj)._get_children(data.rslt.obj);
-        // automatically open if only one child node
-        if (children.length == 1) {
-            $tree.jstree("open_node",children[0]);
-        }
-        // adjust container size
-        var fullHeight = $tree[0].scrollHeight;
-        if (fullHeight > $tree.height()) {
-            fullHeight = Math.min(fullHeight, 700);
-            $treeContainer.animate({height:fullHeight});
-        }
-    })
-            .bind("select_node.jstree", function (event, data) {
-                // click will show the context menu
-                $tree.jstree("show_contextmenu", data.rslt.obj);
-            })
-            .bind("loaded.jstree", function (event, data) {
-                // get rid of the anchor click handler because it hides the context menu (which we are 'binding' to click)
-                //$tree.undelegate("a", "click.jstree");
-                $tree.jstree("open_node","#top");
-            })
-            .jstree({
-                json_data: {
-                    data: {"data":"Kingdoms", "state":"closed", "attr":{"rank":"kingdoms", "id":"top"}},
-                    ajax: {
-                        url: function(node) {
-                            var rank = $(node).attr("rank");
-                            var u = urlConcat(biocacheServicesUrl, "/breakdown.json?q=") + query + "&rank=";
-                            if (rank == 'kingdoms') {
-                                u += 'kingdom';  // starting node
+        .bind("after_open.jstree", function(event, data) {
+            var children = $.jstree._reference(data.rslt.obj)._get_children(data.rslt.obj);
+            // automatically open if only one child node
+            if (children.length == 1) {
+                $tree.jstree("open_node",children[0]);
+            }
+            // adjust container size
+            var fullHeight = $tree[0].scrollHeight;
+            if (fullHeight > $tree.height()) {
+                fullHeight = Math.min(fullHeight, 700);
+                $treeContainer.animate({height:fullHeight});
+            }
+        })
+        .bind("select_node.jstree", function (event, data) {
+            // click will show the context menu
+            $tree.jstree("show_contextmenu", data.rslt.obj);
+        })
+        .bind("loaded.jstree", function (event, data) {
+            // get rid of the anchor click handler because it hides the context menu (which we are 'binding' to click)
+            //$tree.undelegate("a", "click.jstree");
+            $tree.jstree("open_node","#top");
+        })
+        .jstree({
+            json_data: {
+                data: {"data":"Kingdoms", "state":"closed", "attr":{"rank":"kingdoms", "id":"top"}},
+                ajax: {
+                    url: function(node) {
+                        var rank = $(node).attr("rank");
+                        var u = urlConcat(biocacheServicesUrl, "/breakdown.json?q=") + query + "&rank=";
+                        if (rank == 'kingdoms') {
+                            u += 'kingdom';  // starting node
+                        }
+                        else {
+                            u += rank + "&name=" + $(node).attr('id');
+                        }
+                        return u;
+                    },
+                    dataType: 'jsonp',
+                    success: function(data) {
+                        var nodes = [];
+                        var rank = data.rank;
+                        $.each(data.taxa, function(i, obj) {
+                            var label = obj.label + " - " + obj.count;
+                            if (rank == 'species') {
+                                nodes.push({"data":label, "attr":{"rank":rank, "id":obj.label}});
                             }
                             else {
-                                u += rank + "&name=" + $(node).attr('id');
+                                nodes.push({"data":label, "state":"closed", "attr":{"rank":rank, "id":obj.label}});
                             }
-                            return u;
-                        },
-                        dataType: 'jsonp',
-                        success: function(data) {
-                            var nodes = [];
-                            var rank = data.rank;
-                            $.each(data.taxa, function(i, obj) {
-                                var label = obj.label + " - " + obj.count;
-                                if (rank == 'species') {
-                                    nodes.push({"data":label, "attr":{"rank":rank, "id":obj.label}});
-                                }
-                                else {
-                                    nodes.push({"data":label, "state":"closed", "attr":{"rank":rank, "id":obj.label}});
-                                }
-                            });
-                            return nodes;
-                        },
-                        error: function(xhr, text_status) {
-                            //alert(text_status);
-                        }
+                        });
+                        return nodes;
+                    },
+                    error: function(xhr, text_status) {
+                        //alert(text_status);
                     }
-                },
-                core: { animation: 200, open_parents: true },
-                themes:{
-                    theme: treeOptions.theme || 'default',
-                    icons: treeOptions.icons || false,
-                    url: treeOptions.serverUrl + "/js/themes/" + (treeOptions.theme || 'default') + "/style.css"
-                },
-                checkbox: {override_ui:true},
-                contextmenu: {select_node: false, show_at_node: false, items: {
-                    records: {label: "Show records", action: function(obj) {showRecords(obj, query);}},
-                    bie: {label: "Show information", action: function(obj) {showBie(obj);}},
-                    create: false,
-                    rename: false,
-                    remove: false,
-                    ccp: false }
-                },
-                plugins: ['json_data','themes','ui','contextmenu']
-            });
+                }
+            },
+            core: { animation: 200, open_parents: true },
+            themes:{
+                theme: treeOptions.theme || 'default',
+                icons: treeOptions.icons || false,
+                url: treeOptions.serverUrl + "/js/themes/" + (treeOptions.theme || 'default') + "/style.css"
+            },
+            checkbox: {override_ui:true},
+            contextmenu: {select_node: false, show_at_node: false, items: {
+                records: {label: "Show records", action: function(obj) {showRecords(obj, query);}},
+                bie: {label: "Show information", action: function(obj) {showBie(obj);}},
+                create: false,
+                rename: false,
+                remove: false,
+                ccp: false }
+            },
+            plugins: ['json_data','themes','ui','contextmenu']
+        });
 }
 /************************************************************\
  * Go to occurrence records for selected node
@@ -1224,7 +1349,7 @@ function showRecords(node, query) {
     var name = node.attr('id');
     // url for records list
     var recordsUrl = urlConcat(biocacheWebappUrl, "/occurrences/search?q=") + query +
-            "&fq=" + rank + ":" + name;
+        "&fq=" + rank + ":" + name;
     document.location.href = recordsUrl;
 }
 /************************************************************\
@@ -1307,4 +1432,3 @@ function addCommas(nStr)
     }
     return x1 + x2;
 }
-

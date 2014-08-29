@@ -137,16 +137,16 @@ $(document).ready(function() {
         chartsDiv: "recordBreakdowns",
         error: chartsError,
         width: 540,
-        charts: ['collection_uid','state','month','decade'],
+        charts: ['collection_uid','state','month','occurrence_year'],
         collection_uid: {title: 'By collection',  backgroundColor: '#FFFEF7'},
         state: {title: 'By state & territory', backgroundColor: '#FFFEF7'},
         month: {chartType: "column", backgroundColor: '#FFFEF7'},
-        decade: {chartType: "column", backgroundColor: '#FFFEF7'},
+        occurrence_year: {chartType: "column", backgroundColor: '#FFFEF7'},
         backgroundColor: '#FFFEF7'
     }
 
-    //loadFacetCharts(chartOptions);
-    facetChartGroup.loadAndDrawFacetCharts(chartOptions);
+    loadFacetCharts(chartOptions);
+    //facetChartGroup.loadAndDrawFacetCharts(chartOptions);
 
     // alerts button
     $("#alertsButton").click(function(e) {

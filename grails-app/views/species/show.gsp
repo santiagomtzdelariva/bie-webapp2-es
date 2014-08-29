@@ -33,6 +33,7 @@
 <head>
     <meta name="layout" content="main" />
     <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | Atlas of Living Australia</title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <r:require module="show"/>
     <r:script disposition='head'>
         // load google charts api
@@ -680,6 +681,7 @@
                         <div id="recordBreakdowns" style="display: block;">
                             <h2>Charts showing breakdown of occurrence records</h2>
                             <div id="chartsHint">Hint: click on chart elements to view that subset of records</div>
+                            <div id="charts" class=""></div>
                         </div>
                     </div>
 
