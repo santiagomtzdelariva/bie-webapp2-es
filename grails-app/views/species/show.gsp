@@ -33,7 +33,6 @@
 <head>
     <meta name="layout" content="main" />
     <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | Atlas of Living Australia</title>
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <r:require module="show"/>
     <r:script disposition='head'>
         // load google charts api
