@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         compile("au.org.ala:bie-profile:1.1-SNAPSHOT") {
             transitive = false
         }
-        compile("au.org.ala:ala-name-matching:2.1-SNAPSHOT") {
+        compile("au.org.ala:ala-name-matching:2.1") {
             excludes "lucene-core", "lucene-analyzers-common", "lucene-queryparser", "simmetrics"
         }
 
