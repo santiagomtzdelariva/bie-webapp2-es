@@ -15,7 +15,7 @@ before_install:
   | tr -d "\r"`
 - echo "GRAILS_VERSION:$GRAILS_VERSION"
 - gvm install grails $GRAILS_VERSION || true
-before_script:
+
 - wget -q https://raw.githubusercontent.com/AtlasOfLivingAustralia/travis-build-configuration/master/ala_common.sh
 - chmod +x ala_common.sh
 - source ./ala_common.sh
