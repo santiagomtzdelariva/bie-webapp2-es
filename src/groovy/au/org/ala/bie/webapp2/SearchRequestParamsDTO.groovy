@@ -26,15 +26,15 @@ class SearchRequestParamsDTO {
     def q
     def fq
     def start
-    def pageSize
+    def rows
     def sort
     def dir
 
-    SearchRequestParamsDTO(q, fq, start, pageSize, sort, dir) {
+    SearchRequestParamsDTO(q, fq, start, rows, sort, dir) {
         this.q = q
         this.fq = fq
         this.start = start
-        this.pageSize = pageSize
+        this.rows = rows
         this.sort = sort
         this.dir = dir
     }
@@ -50,7 +50,7 @@ class SearchRequestParamsDTO {
             queryStr.append("&fq=" + fq.replaceAll(" ", "+"))
         }
         queryStr.append("&start=" + start)
-        queryStr.append("&pageSize=" + pageSize)
+        queryStr.append("&rows=" + rows)
         queryStr.append("&sort=" + sort)
         queryStr.append("&dir=" + dir)
         return queryStr.toString()

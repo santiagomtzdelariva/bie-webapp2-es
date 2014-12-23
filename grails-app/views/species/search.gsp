@@ -69,7 +69,6 @@
 
     <g:if test="${searchResults.totalRecords}">
         <g:set var="paramsValues" value="${[:]}"/>
-
         <div class="row-fluid">
             <div class="span4">
                 <div class="well well-small">
@@ -128,6 +127,10 @@
                                                 </li>
                                             </g:if>
                                             <g:each var="fieldResult" in="${facetResult.fieldResult}" status="vs">
+                                                <g:if test="${vs == 6}">
+                                                    </ul>
+                                                    <ul class="overflow hide">
+                                                </g:if>
                                                 <g:set var="dateRangeTo"><g:if test="${vs == lastElement}">*</g:if><g:else>${facetResult.fieldResult[vs+1]?.label}</g:else></g:set>
                                                 <g:if test="${facetResult.fieldName?.contains("occurrence_date") && fieldResult.label?.endsWith("Z")}">
                                                     <li><g:set var="startYear" value="${fieldResult.label?.substring(0, 4)}"/>
@@ -146,6 +149,11 @@
                                                 </g:else>
                                             </g:each>
                                         </ul>
+                                        <g:if test="${facetResult.fieldResult.size() > 6}">
+                                        <a href="javascript:showMoreFacets('facet-${facetResult.fieldName}');">
+                                            <i class="icon-hand-right"></i> Choose more
+                                        </a>
+                                        </g:if>
                                     </div>
                                 </g:if>
                             </g:each>
@@ -173,12 +181,13 @@
                                 </div>
                             </div>
                             <div class="span4 control-group">
-                                <label class="control-label" for="sort">Sort by</label>
+                                <label class="control-label" for="sortField">Sort by</label>
                                 <div class="controls">
-                                    <select id="sort" name="sort" class="input-medium">
-                                        <option value="score" ${(params.sort == 'score') ? "selected=\"selected\"" : ""}>best match</option>
-                                        <option value="commonNameSingle" ${(params.sort == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
-                                        <option value="rank" ${(params.sort == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
+                                    <select id="sortField" name="sort" class="input-medium">
+                                        <option value="score" ${(params.sortField == 'score') ? "selected=\"selected\"" : ""}>best match</option>
+                                        <option value="scientificName" ${(params.sortField == 'scientificName') ? "selected=\"selected\"" : ""}>scientific name</option>
+                                        <option value="commonNameSingle" ${(params.sortField == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
+                                        <option value="rank" ${(params.sortField == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
                                     </select>
                                 </div>
                             </div>
@@ -194,11 +203,11 @@
                             <input type="hidden" value="${pageTitle}" name="title"/>
                         </div><!--sortWidget-->
                     </div><!--drop downs-->
-                    <div class="results">
+                    <div class="resultsXX">
                         <g:each var="result" in="${searchResults.results}">
                             <g:set var="sectionText"><g:if test="${!facetMap.idxtype}"><span><b>Section:</b> <g:message code="idxType.${result.idxType}"/></span></g:if></g:set>
                                 <g:if test="${result.has("idxType") && result.idxType == 'TAXON'}">
-                                    <div class="row-fluid">
+                                    <div class="well well-small row-fluid">
                                         <div class="span8">
                                             <h4>
                                             <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
@@ -301,7 +310,7 @@
                                     <h4><g:message code="idxType.${result.idxType}"/>: <a href="${result.guid}">${result.name}</a></h4>
                                     <p><!-- ${sectionText} --></p>
                                 </g:else>
-                            <div class="resultSeparator">&nbsp;</div>
+                            %{--<div class="resultSeparator">&nbsp;</div>--}%
                         </g:each>
                     </div><!--close results-->
                     <g:if test="${false && searchResults && searchResults.totalRecords > searchResults.pageSize}">
@@ -311,7 +320,7 @@
                         </div>
                     </g:if>
                     <div id="searchNavBar" class="pagination">
-                        <g:paginate total="${searchResults?.totalRecords}" action="list"  params="${[q: params.q, fq: params.fq, dir: params.dir ]}"/>
+                        <g:paginate total="${searchResults?.totalRecords}" action="search"  params="${[q: params.q, fq: params.fq, dir: params.dir ]}"/>
                     </div>
                 </div><!--solrResults-->
             </div><!--end .col-wide last-->

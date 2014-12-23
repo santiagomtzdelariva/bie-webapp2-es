@@ -8,7 +8,7 @@ class BieService {
     def grailsApplication
 
     def searchBie(SearchRequestParamsDTO requestObj) {
-        //def json = webService.get(grailsApplication.config.bie.baseURL + "/ws/search.json?" + requestObj.getQueryString())
+//    def searchBie(String queryString) {
         def json = webService.get("http://localhost:8080/taxon-index/solr/search?" + requestObj.getQueryString())
         return JSON.parse(json)
     }

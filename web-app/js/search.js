@@ -26,9 +26,9 @@ $(document).ready(function() {
     }
 
     // listeners for sort widgets
-    $("select#sort").change(function() {
+    $("select#sortField").change(function() {
         var val = $("option:selected", this).val();
-        reloadWithParam('sort',val);
+        reloadWithParam('sortField',val);
     });
     $("select#dir").change(function() {
         var val = $("option:selected", this).val();
@@ -212,4 +212,8 @@ function insertSearchLinks(html) {
     $('#facet-extSearch ul li').sortElements(function(a, b){
         return $(a).data("count") < $(b).data("count") ? 1 : -1;
     });
+}
+
+function showMoreFacets(facetName){
+    $('#'+facetName).find('.overflow').slideToggle('slow');
 }

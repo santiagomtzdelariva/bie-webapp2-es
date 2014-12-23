@@ -38,11 +38,17 @@ class SpeciesController {
         if(query == "*") query = ""
         def filterQuery = params.list('fq') // will be a list even with only one value
         def startIndex = params.offset?:0
-        def pageSize = params.max?:10
-        def sortField = params.sort?:""  //FIXME
+        def rows = params.rows?:10
+        def sortField = params.sortField?:""  //FIXME
         def sortDirection = params.dir?:"asc"
-        def requestObj = new SearchRequestParamsDTO(query, filterQuery, startIndex, pageSize, sortField, sortDirection)
+        def sort = ""
+        if(sortField){
+            sort = sortField + "+" + sortDirection
+        }
+
+        def requestObj = new SearchRequestParamsDTO(query, filterQuery, startIndex, rows, sort, sortDirection)
         def searchResults = bieService.searchBie(requestObj)
+//        def searchResults = bieService.searchBie(request.getQueryString())
         log.debug "SearchRequestParamsDTO = " + requestObj
 
         // empty search -> search for all records
@@ -54,7 +60,7 @@ class SpeciesController {
         if (filterQuery.size() > 1 && filterQuery.findAll { it.size() == 0 }) {
             // remove empty fq= params IF more than 1 fq param present
             def fq2 = filterQuery.findAll { it } // excludes empty or null elements
-            redirect(action: "search", params: [q: query, fq: fq2, start: startIndex, pageSize: pageSize, score: sortField, dir: sortDirection])
+            redirect(action: "search", params: [q: query, fq: fq2, start: startIndex, rows: rows, score: sortField, dir: sortDirection])
         }
 
         if (searchResults instanceof JSONObject && searchResults.has("error")) {
