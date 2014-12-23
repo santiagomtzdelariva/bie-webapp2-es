@@ -36,7 +36,7 @@ $(document).ready(function() {
     });
     $("select#per-page").change(function() {
         var val = $("option:selected", this).val();
-        reloadWithParam('max',val);
+        reloadWithParam('rows',val);
     });
 
     // AJAX search results

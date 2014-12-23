@@ -290,26 +290,13 @@
                         </div>
                         <div class="span6">
                             <div id="leafletMap" style="height:500px;  border-radius: 5px;"> </div>
-                            <a href="#" class="btn btn-large  pull-right">View Interactive Map</a>
-                            <a href="#" class="btn btn-large  pull-right">View Locations</a>
-
-                                %{--<div id="expertDistroDiv" style="display:none;margin-bottom: 10px;">--}%
-                                    %{--<h2>Compiled distribution map</h2>--}%
-                                    %{--<img id="distroMapImage" src="${resource(dir: 'images', file: 'noImage.jpg')}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>--}%
-                                    %{--<div class="mapAttribution">Compiled distribution map provided by <span id="dataResource">[data resource not known]</span></div>--}%
-                                %{--</div>--}%
-                                %{--<h2>Occurrence records map</h2>--}%
-
-
-                                %{--<div class="bg-white">--}%
-                                    %{--<g:set var="spatialQuery" value="lsid:%22${guid}%22%20AND%20geospatial_kosher:true"/>--}%
-                                    %{--<img id="mapImage" src="http://biocache.ala.org.au/ws/density/map?q=${spatialQuery}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>--}%
-                                    %{--<img id="mapLegend" src="http://biocache.ala.org.au/ws/density/legend?q=${spatialQuery}" class="distroLegend" alt="map legend" onerror="this.style.display='none'"/>--}%
-                                %{--</div>--}%
-                                %{--<p>--}%
-                                    %{--<a class="btn" href="${biocacheUrl}/occurrences/taxa/${guid}" title="View records list">View records list</a>--}%
-                                    %{--<a class="btn" href="${spatialPortalUrl}/?q=lsid:%22${guid}%22&cm=geospatial_kosher" title="Map & analyse records">Map &amp; analyse records</a>--}%
-                                %{--</p>--}%
+                            <a href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString}#tab_mapView" class="btn btn-large pull-right">View Interactive Map</a>
+                            <a href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString}#tab_recordsView" class="btn btn-large pull-right">View Locations</a>
+                            %{--<div id="expertDistroDiv" style="display:none;margin-bottom: 10px;">--}%
+                                %{--<h2>Compiled distribution map</h2>--}%
+                                %{--<img id="distroMapImage" src="${resource(dir: 'images', file: 'noImage.jpg')}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>--}%
+                                %{--<div class="mapAttribution">Compiled distribution map provided by <span id="dataResource">[data resource not known]</span></div>--}%
+                            %{--</div>--}%
                         </div>
                     </div>
                 </section>

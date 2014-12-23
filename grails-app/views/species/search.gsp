@@ -19,7 +19,7 @@
 <html>
 <head>
     <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
-    <title>${query} | Search | <g:message code="site.title"/></title>
+    <title>${query} | Search | ${grailsApplication.config.skin.orgNameLong}</title>
     <r:require modules="search, pagination"/>
     <r:script disposition='head'>
         // global var to pass GSP vars into JS file
@@ -160,30 +160,36 @@
                             <g:set var="downloadUrl" value="${grailsApplication.config.bie.baseURL}/ws/download/?${downloadParams}${appendQueryParam}&sort=${searchResults.sort}&dir=${searchResults.dir}"/>
                             <input type="button" onclick="window.location='${downloadUrl}'" value="Download" title="Download a list of taxa for your search" class="btn btn-small" style="float:left;"/>
                         </g:if>
-                        <div id="sortWidgetXX" class="row-fluid">
-                            <div class="span4">
-                                <label for="per-page">Results per page</label>
-                                <select id="per-page" name="per-page" class="input-mini">
-                                    <option value="10" ${(params.max == '10') ? "selected=\"selected\"" : ""}>10</option>
-                                    <option value="20" ${(params.max == '20') ? "selected=\"selected\"" : ""}>20</option>
-                                    <option value="50" ${(params.max == '50') ? "selected=\"selected\"" : ""}>50</option>
-                                    <option value="100" ${(params.max == '100') ? "selected=\"selected\"" : ""} >100</option>
-                                </select>
+                        <div id="sortWidgetXX" class="row-fluid form-horizontal">
+                            <div class="span4 control-group">
+                                <label class="control-label" for="per-page">Results per page</label>
+                                <div class="controls">
+                                    <select id="per-page" name="per-page" class="input-mini">
+                                        <option value="10" ${(params.rows == '10') ? "selected=\"selected\"" : ""}>10</option>
+                                        <option value="20" ${(params.rows == '20') ? "selected=\"selected\"" : ""}>20</option>
+                                        <option value="50" ${(params.rows == '50') ? "selected=\"selected\"" : ""}>50</option>
+                                        <option value="100" ${(params.rows == '100') ? "selected=\"selected\"" : ""} >100</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="span4">
-                                <label for="sort">Sort by</label>
-                                <select id="sort" name="sort" class="input-medium">
-                                    <option value="score" ${(params.sort == 'score') ? "selected=\"selected\"" : ""}>best match</option>
-                                    <option value="commonNameSingle" ${(params.sort == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
-                                    <option value="rank" ${(params.sort == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
-                                </select>
+                            <div class="span4 control-group">
+                                <label class="control-label" for="sort">Sort by</label>
+                                <div class="controls">
+                                    <select id="sort" name="sort" class="input-medium">
+                                        <option value="score" ${(params.sort == 'score') ? "selected=\"selected\"" : ""}>best match</option>
+                                        <option value="commonNameSingle" ${(params.sort == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
+                                        <option value="rank" ${(params.sort == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="span4">
-                                <label for="dir">Sort order</label>
-                                <select id="dir" name="dir" class="input-small">
-                                    <option value="asc" ${(params.dir == 'asc') ? "selected=\"selected\"" : ""}>normal</option>
-                                    <option value="desc" ${(params.dir == 'desc') ? "selected=\"selected\"" : ""}>reverse</option>
-                                </select>
+                            <div class="span4 control-group">
+                                <label class="control-label" for="dir">Sort order</label>
+                                <div class="controls">
+                                    <select id="dir" name="dir" class="input-small">
+                                        <option value="asc" ${(params.dir == 'asc') ? "selected=\"selected\"" : ""}>normal</option>
+                                        <option value="desc" ${(params.dir == 'desc') ? "selected=\"selected\"" : ""}>reverse</option>
+                                    </select>
+                                </div>
                             </div>
                             <input type="hidden" value="${pageTitle}" name="title"/>
                         </div><!--sortWidget-->
@@ -209,6 +215,27 @@
                                             </g:if>
                                             <g:if test="${result.commonNameSingle}"><span class="commonNameSummary">&nbsp;&ndash;&nbsp; ${result.commonNameSingle}</span></g:if>
                                             </h4>
+
+                                            <p>
+                                                <g:if test="${result.commonNameSingle && result.commonNameSingle != result.commonName}">
+                                                    <span>${result.commonName}</span>
+                                                </g:if>
+                                                <g:if test="${false && result.highlight}">
+                                                    <span><b>...</b> ${result.highlight} <b>...</b></span>
+                                                </g:if>
+                                                <g:if test="${result.kingdom}">
+                                                    <span><strong class="resultsLabel">Kingdom</strong>: ${result.kingdom}</span>
+                                                </g:if>
+                                                <g:if test="${result.rankId && result.rankId > 5000}">
+                                                    <span class="recordSighting" style="display:inline;">
+                                                        <a href="${grailsApplication.config.brds.guidUrl}${result.guid}">Record a sighting/share a photo</a>
+                                                    </span>&nbsp;
+                                                    <g:if test="${result?.occCount?:0 > 0}">
+                                                        <span class="recordSighting" style="display:inline;"><a href="${biocacheUrl}/occurrences/taxa/${result.guid}">Occurrences:
+                                                            <g:formatNumber number="${result.occCount}" type="number"/></a></span>
+                                                    </g:if>
+                                                </g:if>
+                                            </p>
                                         </div>
                                         <div class="span4">
                                             <g:if test="${result.smallImageUrl}">
@@ -218,27 +245,6 @@
                                     </div>
 
                                     <p>
-                                        <g:if test="${result.commonNameSingle && result.commonNameSingle != result.commonName}">
-                                            <span>${result.commonName?:"".substring(0, 220)}<g:if test="${result.commonName?.length()?:0 > 220}">...</g:if></span>
-                                        </g:if>
-                                        <g:if test="${false && result.highlight}">
-                                            <span><b>...</b> ${result.highlight} <b>...</b></span>
-                                        </g:if>
-                                        <g:if test="${result.kingdom}">
-                                            <span><strong class="resultsLabel">Kingdom</strong>: ${result.kingdom}</span>
-                                        </g:if>
-                                        <g:if test="${result.rankId && result.rankId > 5000}">
-                                            <span class="recordSighting" style="display:inline;">
-                                                <a href="${grailsApplication.config.brds.guidUrl}${result.guid}">Record a sighting/share a photo</a>
-                                            </span>&nbsp;
-                                            <g:if test="${result?.occCount?:0 > 0}">
-                                                <span class="recordSighting" style="display:inline;"><a href="${biocacheUrl}/occurrences/taxa/${result.guid}">Occurrences:
-                                                    <g:formatNumber number="${result.occCount}" type="number"/></a></span>
-                                            </g:if>
-                                        </g:if>
-                                        %{--<g:if test="${result.rankId && result.rankId < 7000}">--}%
-                                            %{--&nbsp;<span style="display:inline;"><a href="${createLink(controller:'image-search', action: 'showSpecies', params:[taxonRank: result.rank, scientificName: (result.nameComplete) ? result.nameComplete : result.name])}">View images of species</a></span>--}%
-                                        %{--</g:if>--}%
                                     <!-- ${sectionText} -->
                                     </p>
                                 </g:if>
