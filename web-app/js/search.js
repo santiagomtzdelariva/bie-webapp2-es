@@ -59,45 +59,23 @@ $(document).ready(function() {
  *
  * @param facet
  */
-function removeFacet(facet) {
+function removeFacet(facetIdx) {
+
     var q = $.getQueryParam('q') ? $.getQueryParam('q') : SEARCH_CONF.query ; //$.query.get('q')[0];
     var fqList = $.getQueryParam('fq'); //$.query.get('fq');
+
+    console.log('Remove facet.,...');
+    console.log(facetIdx);
+    console.log(fqList);
+
     var paramList = [];
 
-    //is this a init search?
-//    if(fqList == null || fqList == 'undefined'){
-//        if('australian_s:recorded' == facet){
-//            fqList = ['australian_s:recorded'];
-//        }
-//        else{
-//            fqList = [''];
-//        }
-//    }
     if (q != null) {
         paramList.push("q=" + q);
     }
 
-    //alert("this.facet = "+facet+"; fqList = "+fqList.join('|'));
+    fqList.splice(facetIdx,1);
 
-    if (fqList instanceof Array && fqList.length > 1) {
-        //alert("fqList is an array");
-        for (var i in fqList) {
-            //alert("i == "+i+" | fq = "+ decodeURIComponent(fqList[i]));
-            var decodedFq = decodeURIComponent(fqList[i]);
-            if (decodedFq == facet) {
-                //alert("removing fq: "+fqList[i]);
-                fqList.splice($.inArray(fqList[i],fqList),1);
-            }
-        }
-    } else {
-        var decodedFq = decodeURIComponent(fqList);
-        //alert("fqList is NOT an array: '" + decodedFq + "' vs '" + facet + "'");
-        if (decodedFq == facet) {
-            //alert("match");
-            fqList = null;
-        }
-    }
-    //alert("(post) fqList = "+fqList.join('|'));
     if (fqList != null && fqList.length > 0) {
         paramList.push("fq=" + fqList.join("&fq="));
         //alert("pushing fq back on: "+fqList);
@@ -105,7 +83,7 @@ function removeFacet(facet) {
         // empty fq so redirect doesn't happen
         paramList.push("fq=");
     }
-    //alert("new URL: " + window.location.pathname + '?' + paramList.join('&'));
+    console.log("new URL: " + window.location.pathname + '?' + paramList.join('&'));
     window.location.href = window.location.pathname + '?' + paramList.join('&');
 }
 
@@ -207,7 +185,7 @@ function injectBhlResults() {
 function injectBiocacheResults() {
 
     var queryToUse = (SEARCH_CONF.query == "" || SEARCH_CONF.query == "*" ? "*:*" : SEARCH_CONF.query);
-    var url = SEARCH_CONF.biocacheUrl + "/ws/occurrences/search.json?q=" + queryToUse + "&start=0&pageSize=0&facet=off";
+    var url = SEARCH_CONF.biocacheServicesUrl + "/occurrences/search.json?q=" + queryToUse + "&start=0&pageSize=0&facet=off";
     $.ajax({
         url: url,
         dataType: 'jsonp',
@@ -224,7 +202,7 @@ function insertSearchLinks(html) {
     // check if the "related searches" facet section exists
     if (!$("div#facet-extSearch").length) {
         // if not, create it
-        var h2 = "<h3>Related Searches</h3>";
+        var h2 = "<h4>Related Searches</h4>";
         var div = "<div class='subnavlist' id='facet-extSearch'><ul></ul></div>";
         $("#relatedSearches").append(h2 + div);
     }

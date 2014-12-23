@@ -23,8 +23,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <meta name="layout" content="main" />
-    <title>Biodiversity Information Explorer | Atlas of Living Australia</title>
+    <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
+    <title>Biodiversity Information Explorer</title>
     <style type="text/css" media="screen">
         #inpage_search {
             float:left;
@@ -105,21 +105,14 @@
             <nav id="breadcrumb" class="span12">
                 <ol class="breadcrumb">
                     <li><a href="${alaUrl}">Home</a> <span class=" icon icon-arrow-right"></span></li>
-                    <li><a href="${alaUrl}/australias-species/">Australia&#39;s species</a> <span class=" icon icon-arrow-right"></span></li>
-                    <li class="active">Biodiversity Information Explorer (BIE)</li>
+                    <li>species</li>
                 </ol>
             </nav>
-            <hgroup>
-                <h1>Biodiversity Information Explorer</h1>
-            </hgroup>
         </div>
     </header>
     <div class="inner">
         <div class="section">
-            <p>
-                Welcome to the Atlas of Living Australia <strong>Biodiversity Information Explorer (BIE)</strong><br/>
-                For a listing of webservices for the BIE, <a href="${grailsApplication.config.bie.baseURL}/ws"><strong>click here</strong></a>.</p>
-            <h2 style="">Free text search for taxa</h2>
+            <h2 style="">Free text search for species and higher taxa</h2>
             <div class="section" style="margin-bottom:60px">
                 <div>
                     <form id="search-inpage" action="search" method="get" name="search-form">
@@ -127,9 +120,6 @@
                             <input id="search" class="span4" name="q" type="text" placeholder="Search the Atlas" autocomplete="off">
                             <input type="submit" class="btn" alt="Search" value="Search">
                         </div>
-                        %{--<label for="search">Search</label>--}%
-                        %{--<input type="text" class="filled ac_input" id="search" name="q" placeholder="Search the Atlas" autocomplete="off">--}%
-                        %{--<span class="search-button-wrapper"><input type="submit" class="search-button" alt="Search" value="Search"></span>--}%
                     </form>
                 </div>
             </div>

@@ -26,13 +26,14 @@ var baseFacetChart = {
     width: 480,
     height: 350,
     chartArea: {left:0, top:30, width:"90%", height: "70%"},
-    is3D: true,
+    is3D: false,
     titleTextStyle: {color: "#555", fontName: 'Arial', fontSize: 15},
     sliceVisibilityThreshold: 0,
     legend: {position: "right"},
     chartType: "pie",
     column1DataType: 'string',
     datasets: 1,
+    backgroundColor: {fill:'transparent'},
     // defaults for individual facet charts
     individualChartOptions: {
         state_conservation: {chartArea: {left:60, height: "58%"}, title: 'By state conservation status'},

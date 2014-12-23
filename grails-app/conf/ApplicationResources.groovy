@@ -1,4 +1,16 @@
 modules = {
+
+    bootstrap2 {
+        dependsOn 'jquery'
+        resource url:[dir:'bootstrap/js', file:'bootstrap.js'], disposition: 'head', exclude: '*'
+        resource url:[dir:'bootstrap/css', file:'bootstrap.css'], attrs:[media:'screen, projection, print']
+        resource url:[dir:'bootstrap/css', file:'bootstrap-responsive.css'], attrs:[media:'screen', id:'responsiveCss'], exclude: '*'
+    }
+
+    pagination {
+        resource url:[dir:'css', file:'pagination.css'], attrs:[media:'screen']
+    }
+
     application {
         resource url:'js/application.js'
         resource url:'css/AlaBsAdditions.css'
@@ -12,6 +24,8 @@ modules = {
 
     show {
         dependsOn 'colorbox, fancybox, cleanHtml, snazzy, bootstrap'
+        resource url: "http://leafletjs.com/dist/leaflet.js" , attrs:[type:'js'], disposition: 'head'
+        resource url: "http://leafletjs.com/dist/leaflet.css" , attrs:[type:'css'], disposition: 'head'
         resource url:[dir:'css', file:'species.css']
         resource url:[dir:'css', file:'jquery.qtip.min.css']
         resource url:[dir:'js', file:'jquery.sortElemets.js', disposition: 'head']

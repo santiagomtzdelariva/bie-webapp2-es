@@ -27,7 +27,7 @@
 <html>
 <head>
     <title>${params.q} | BHL Search | Atlas of Living Australia</title>
-    <meta name="layout" content="main" />
+    <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
     <r:require modules="colorbox, cleanHtml, snazzy"/>
     <r:script disposition='head'>
         /**

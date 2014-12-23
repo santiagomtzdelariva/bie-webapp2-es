@@ -1,8 +1,6 @@
 package au.org.ala.bie.webapp2
-
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
 class ExternalSiteController {
@@ -21,7 +19,7 @@ class ExternalSiteController {
         Document doc = Jsoup.connect(url).get()
         Elements results = doc.select("div.rslt")
 
-        def totalResultsRaw = doc.select("a[title=Total Results]").text()
+        def totalResultsRaw = doc.select("input[name=EntrezSystem2.PEntrez.Nuccore.Sequence_ResultsPanel.Sequence_ResultsController.ResultCount]").text()
         def matcher = totalResultsRaw =~ "All \\(([0-9]{1,})\\)"
         def found = matcher.find()
         def totalResults = 0

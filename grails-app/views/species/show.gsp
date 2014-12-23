@@ -31,39 +31,42 @@
 <!doctype html>
 <html>
 <head>
-    <meta name="layout" content="main" />
-    <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | Atlas of Living Australia</title>
-    <r:require module="show"/>
+    <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
+    <meta name="fluidLayout" content="${true}" />
+    <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | ${raw(grailsApplication.config.skin.orgNameLong)}</title>
+    %{--<script src="http://leafletjs.com/dist/leaflet.js"></script>--}%
     <r:script disposition='head'>
+        // global var to pass GSP vars into JS file
+        var SHOW_CONF = {
+            biocacheUrl:        "${grailsApplication.config.biocache.baseURL}",
+            biocacheServiceUrl: "${grailsApplication.config.biocacheService.baseURL}",
+            collectoryUrl:      "${grailsApplication.config.collectory.baseURL}",
+            guid:               "${guid}",
+            scientificName:     "${tc?.taxonConcept?.nameString?:''}",
+            synonymsQuery:      "${synonymsQuery}",
+            citizenSciUrl:      "${citizenSciUrl}",
+            serverName:         "${grailsApplication.config.grails.serverURL}",
+            bieUrl:             "${grailsApplication.config.bie.baseURL}",
+            alertsUrl:          "${grailsApplication.config.alerts.baseUrl}",
+            remoteUser:         "${request.remoteUser?:''}",
+            genbankUrl:         "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
+            scholarUrl:         "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
+            soundUrl:           "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}"
+        }
         // load google charts api
         google.load("visualization", "1", {packages:["corechart"]});
-
-        // global var to pass GSP vars into JS file
-        SHOW_CONF = {
-            biocacheUrl:    "${biocacheUrl}",
-            collectoryUrl:  "${collectoryUrl}",
-            guid:           "${guid}",
-            scientificName: "${tc?.taxonConcept?.nameString?:''}",
-            synonymsQuery:  "${synonymsQuery}",
-            citizenSciUrl:  "${citizenSciUrl}",
-            serverName:     "${grailsApplication.config.grails.serverURL}",
-            bieUrl:         "${grailsApplication.config.bie.baseURL}",
-            alertsUrl:      "${grailsApplication.config.alerts.baseUrl}",
-            remoteUser:     "${request.remoteUser?:''}",
-            genbankUrl:     "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
-            scholarUrl:     "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
-            soundUrl:       "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}"
-        }
 
         $(function(){
             $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
                 $('#genbankResultCount').html('-  <a href="' + data.resultsUrl + '"> view all results - ' + data.total + '</a>');
-                $.each(data.results, function(idx, result){
-                   $('#genbank').append('<tr><td>'+
-                        '<a class="externalLink" href="' + result.link + '">' + result.title + '</a><br/>' +
-                        '<span class="">' + result.description + '</span><br/>' +
-                        '<span class="">' + result.furtherDescription +'</span></td></tr>');
-                });
+                if(data.results){
+                    $.each(data.results, function(idx, result){
+                       $('#genbank').append('<tr><td>'+
+                            '<a class="externalLink" href="' + result.link + '">' + result.title + '</a><br/>' +
+                            '<span class="">' + result.description + '</span><br/>' +
+                            '<span class="">' + result.furtherDescription +'</span></td></tr>');
+                    });
+                }
             });
 
             $.ajax({url: SHOW_CONF.soundUrl}).done(function ( data ) {
@@ -85,182 +88,115 @@
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 //alert( "error" + errorThrown);
             });
-        })
-    </r:script>
-    <style type="text/css">
 
+            loadMap();
+
+            showSpeciesPage();
+        })
+
+        function loadMap() {
+
+            //add an occurrence layer for macropus
+            var macropus = L.tileLayer.wms("http://ala-demo.gbif.org/biocache-service/mapping/wms/reflect?q=" + SHOW_CONF.scientificName, {
+                layers: 'ALA:occurrences',
+                format: 'image/png',
+                transparent: true,
+                attribution: "${raw(orgNameLong)}",
+                bgcolor: "0x000000",
+                outline: "true",
+                ENV: "color:5574a6;name:circle;size:4;opacity:1"
+            });
+
+            var speciesLayers = new L.LayerGroup();
+            macropus.addTo(speciesLayers);
+
+            var map = L.map('leafletMap', {
+                center: [54.6, -3.2],
+                zoom: 5,
+                layers: [speciesLayers]
+            });
+
+            var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="http://mapbox.com">Mapbox</a>';
+            var mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+            var defaultBaseLayer = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr});
+
+            defaultBaseLayer.addTo(map);
+
+            var baseLayers = {
+                "Default": defaultBaseLayer
+            };
+
+            var overlays = {
+                "Species layer": macropus
+            };
+
+            L.control.layers(baseLayers, overlays).addTo(map);
+
+            map.on('click', onMapClick);
+            map.invalidateSize(false);
+        }
+
+        function onMapClick(e) {
+            $.ajax({
+                url: SHOW_CONF.biocacheServiceUrl + "/occurrences/info",
+                jsonp: "callback",
+                dataType: "jsonp",
+                data: {
+                    q: SHOW_CONF.scientificName,
+                    zoom: "6",
+                    lat: e.latlng.lat,
+                    lon: e.latlng.lng,
+                    radius: 20,
+                    format: "json"
+                },
+                success: function (response) {
+                    var popup = L.popup()
+                            .setLatLng(e.latlng)
+                            .setContent("Occurrences at this point: " + response.count)
+                            .openOn(map);
+                }
+            });
+        }
+    </r:script>
+    <r:require module="show"/>
+    <style type="text/css">
         div.audiojs { margin: 15px 0px 5px; }
         div.audiojs div.scrubber { width:120px;}
         div.audiojs div.time { display:none; width:50px; }
-
     </style>
 </head>
-<body class="species nav-species content">
-    <header id="page-header">
-        <div class="inner row-fluid">
-            <div id="breadcrumb" class="span12">
-                <ol class="breadcrumb">
-                    <li><a href="${alaUrl}">Home</a> <span class=" icon icon-arrow-right"></span></li>
-                    <li><a href="${alaUrl}/australias-species/">Australia&#39;s species</a> <span class=" icon icon-arrow-right"></span></li>
-                    <li class="active"><bie:formatSciName name="${tc?.taxonConcept?.nameString}" rankId="${tc?.taxonConcept?.rankID?:0}"/></li>
-                </ol>
-            </div>
-        </div>
-        <hgroup class="row-fluid">
-            <div class="span8">
-                <h1><bie:formatSciName name="${tc?.taxonConcept?.nameString}" rankId="${tc?.taxonConcept?.rankID?:0}"/>
-                    <span>${tc?.taxonConcept?.author?:""}</span></h1>
-                <h2>${(tc?.commonNames) ? tc?.commonNames?.opt(0)?.nameString : '<br/>'}</h2>
-            </div>
-            <div class="span4" id="actionButtons">
-                <a href="${citizenSciUrl}${guid}" class="btn btn-ala" title="Record a sighting">Record a sighting</a>
-                <a id="alertsButton" class="btn btn-ala" href="#">Alerts <i class="icon-bell icon-white"></i></a>
-            </div>
-        </hgroup>
-    </header>
-    <div class="row-fluid">
-        <div class="span3">
-            <div class="well">
-                <section class="meta">
-                    <dl>
-                        <dt>Name source</dt>
-                        <dd><a href="${tc?.taxonConcept?.infoSourceURL}" target="_blank" class="external">${tc?.taxonConcept?.infoSourceName}</a></dd>
-                        <dt>Rank</dt>
-                        <dd style="text-transform: capitalize;">${tc?.taxonConcept?.rankString}</dd>
-                        <dt>Data links</dt>
-                        <dd><a href="#lsidText" id="lsid" class="btn btn-small" title="Life Science Identifier (pop-up)">LSID</a>
-                            <a href="#dataLinksText" id="dataLinks" class="btn btn-small" title="JSON web service">JSON / <g:if test="${tc?.taxonConcept?.rankID?:1 % 1000 == 0}">WMS /</g:if>RDF</a>
-                        </dd>
-                        %{--<dt>Related pages</dt>--}%
-                        %{--<dd><a class="button" href="${biocacheUrl}/occurrences/taxa/${guid}" title="View occurrence records for ${sciNameFormatted}">Species records</a></dd>--}%
-                        %{--<dd><a class="button" href="${spatialPortalUrl}/?q=lsid:%22${guid}%22&cm=geospatial_kosher" title="GIS analysis of occurrence records for ${sciNameFormatted}">Spatial analysis</a></dd>--}%
-                    </dl>
-                    <div class="hide">
-                        <div id="lsidText">
-                            <h2><a href="http://lsids.sourceforge.net/" target="_blank" title="More information on LSIDs">Life Science Identifier (LSID):</a></h2>
-                            <p><a href="http://lsid.tdwg.org/summary/${guid}" target="_blank" title="Original source for this LSID">${guid}</a></p>
-                            <p>LSIDs are persistent, location-independent,resource identifiers for uniquely naming biologically significant resources including species names, concepts, occurrences, genes or proteins, or data objects that encode information about them. To put it simply, LSIDs are a way to identify and locate pieces of biological information on the web.</p>
-                        </div>
+<body class="speciesXX nav-speciesXX contentXX">
 
-                        <div id="dataLinksText" style="text-align: left;">
-                            <h1>Data Links</h1>
-                            <h2>JSON</h2>
-                            <p>
-                                For a JSON view of this data, click <a href="${grailsApplication.config.ala.bie.baseURL}/ws/species/${tc?.taxonConcept?.guid}.json">here</a>
-                            </p>
-                            <g:if test="${tc?.taxonConcept?.rankID?:1 % 1000 == 0}">
-                            <h2>WMS</h2>
-                            <p>
-                                To use WMS services, copy and paste the following GetCapabilities URL into your
-                                OGC client (e.g. <a href="http://udig.refractions.net">uDIG</a>,
-                                    <a href="http://www.esri.com/software/arcgis">ESRI ArcGIS</a>) <br/>
-                                <a href="http://biocache.ala.org.au/ws/ogc/ows?q=${tc?.taxonConcept?.rankString}:${tc?.taxonConcept?.nameString}">
-                                    http://biocache.ala.org.au/ws/ogc/ows?q=${tc?.taxonConcept?.rankString}:${tc?.taxonConcept?.nameString}
-                                </a><br/>
-                                For higher taxa, this will give you a hierarchical listing of layers for each taxon.
-                            </p>
-                            </g:if>
-
-                            <h2>RDF</h2>
-                            <p>
-                                To download an RDF/XML document for the concepts and names click
-                                <a href="http://biodiversity.org.au/taxon/${tc?.taxonConcept?.nameString}.rdf">here</a><br/>
-                                A JSON view of this information is here
-                                <a href="http://biodiversity.org.au/taxon/${tc?.taxonConcept?.nameString}.json">here</a> <br/>
-                                A html view of this information is here
-                                <a href="http://biodiversity.org.au/taxon/${tc?.taxonConcept?.nameString}">here</a>
-                            </p>
-
-                            <h2>Further details</h2>
-                            <p> For more details on occurrence webservices, <a href="http://biocache.ala.org.au/ws">click here</a><br/>
-                                For more details on names webservices, click <a href="http://biodiversity.org.au">here</a>
-                            </p>
-                        </div>
-                    </div>
-
-                </section>
-                <g:if test="${tc.habitats || tc?.taxonConcept?.rankID?:0 >= 7000 && tc.isAustralian}">
-                    <section class="status">
-                        <dl>
-                            <dt>Species presence</dt>
-                            <g:if test="${tc?.taxonConcept?.rankID?:0 >= 7000}">
-                                <g:set var="isAussie" value=""/>
-                                <g:if test="${isAustralian != null}">
-                                    <g:set var="isAussie" value="${isAustralian}"/>
-                                </g:if>
-                                <g:else>
-                                    <g:set var="isAussie" value="${tc.isAustralian}"/>
-                                </g:else>
-                                %{-- NC 2013-06-19: We don't wnat ot report that a species is ausralian if AFD or APC has excluded its presence --}%
-                                %{-- TODO we probably need to have an icon to represent that the species "is excluded" --}%
-                                <g:if test="${isAussie && !tc.taxonConcept.isExcluded}">
-                                    <dd><span class="native">&nbsp;</span>Recorded In Australia</dd>
-                                </g:if>
-                                <g:else>
-                                    <dd><span class="nonnative">&nbsp;</span>Not recorded In Australia</dd>
-                                </g:else>
-                            </g:if>
-                            <g:each var="habitat" in="${tc.habitats}">
-                                <g:set var="divMarine">
-                                    <dd><span class="marine">&nbsp;</span>Marine Habitats</dd>
-                                </g:set>
-                                <g:set var="divTerrestrial">
-                                    <dd><span class="terrestrial">&nbsp;</span>Terrestrial Habitats</dd>
-                                </g:set>
-                                <g:set var="divLimnetic">
-                                    <dd><span class="terrestrial-aquatic">&nbsp;</span>Terrestrial Aquatic Habitats</dd>
-                                </g:set>
-                                <g:if test="${habitat.status == 'M'}">${divMarine}</g:if>
-                                <g:elseif test="${habitat.status == 'N'}">${divTerrestrial}</g:elseif>
-                                <g:elseif test="${habitat.status == 'Limnetic'}">${divLimnetic}</g:elseif>
-                                <g:else>${divMarine} ${divTerrestrial}</g:else>
-                            </g:each>
-                        </dl>
-                    </section>
-                </g:if>
-                <g:if test="${tc.conservationStatuses}">
-                    <section class="status">
-                        <dl>
-                            <dt>Conservation status</dt>
-                            <g:each var="status" in="${tc.conservationStatuses}">
-                                <g:set var="regionCode" value="${status.region ?: "IUCN"}"/>
-                                <dd>
-                                    <a href="${grailsApplication.config.collectory.threatenedSpeciesCodesUrl}/${statusRegionMap.get(regionCode)}" title="Threatened Species Codes - details"
-                                       onclick="window.open(this.href); return false;"><span class="iucn <bie:colourForStatus status="${status.status}"/>"><g:message
-                                            code="region.${regionCode}"/></span>${status.rawStatus}</a>
-                                </dd>
-                            </g:each>
-                        </dl>
-                    </section>
-                </g:if>
-                <g:if test="${tc.categories}">
-                    <section class="status">
-                        <dl>
-                            <dt>Categories</dt>
-                            <dd>
-                                <table class="status">
-                                    <g:each var="category" in="${tc.categories}">
-                                        <div>
-                                            <g:set var="catURL" value="${category.identifier?:category.infoSourceURL}" />
-                                            <tr>
-                                                <g:if test="${category.stateProvince}">
-                                                    <td><a href="${catURL}" title="Category details" onclick="window.open(this.href); return false;">
-                                                        <span class="iucn category"><g:message
-                                                                code="region.${category.stateProvince}"/></span></a></td></g:if>
-                                                <td><a href="${catURL}" title="Category details" onclick="window.open(this.href); return false;">
-                                                    ${category.category}
-                                                </a></td>
-                                            </tr>
-                                        </div>
-                                    </g:each>
-                                </table>
-                            </dd>
-                        </dl>
-                    </section>
-                </g:if>
+        <header id="page-header">
+            <div class="inner row-fluid">
+                <div id="breadcrumb" class="span12">
+                    <ol class="breadcrumb">
+                        <li><a href="${alaUrl}">Home</a> <span class=" icon icon-arrow-right"></span></li>
+                        <li><g:link controller="species" action="search">Species</g:link> <span class=" icon icon-arrow-right"></span></li>
+                        <li class="active"><bie:formatSciName name="${tc?.taxonConcept?.nameString}" rankId="${tc?.taxonConcept?.rankID?:0}"/></li>
+                    </ol>
+                </div>
             </div>
-        </div><!--col-narrow-->
-        <div class="span9">
+            <hgroup class="row-fluid">
+                <div class="span8">
+                    <h1><bie:formatSciName name="${tc?.taxonConcept?.nameString}" rankId="${tc?.taxonConcept?.rankID?:0}"/>
+                        <span>${tc?.taxonConcept?.author?:""}</span>
+                    </h1>
+                    <g:if test="${tc?.commonNames}">
+                        <h2>${(tc?.commonNames) ? tc?.commonNames?.opt(0)?.nameString : '<br/>'}</h2>
+                    </g:if>
+                    <h4>Name authority: ${tc?.taxonConcept.infoSourceName}</h4>
+                </div>
+                <div class="span4" id="actionButtons">
+                    <a href="${citizenSciUrl}${guid}" class="btn btn-ala" title="Record a sighting">Record a sighting</a>
+                    <a id="alertsButton" class="btn btn-ala" href="#">Alerts <i class="icon-bell"></i></a>
+                </div>
+            </hgroup>
+        </header>
+
+        <div class="row-fluidXX">
             <div class="tabbable tabs-belowZ">
                 <ul class="nav nav-tabs">
                     <li class="active"><a id="t1" href="#overview" data-toggle="tab">Overview</a></li>
@@ -272,87 +208,111 @@
                     <li><a id="t7" href="#other" data-toggle="tab">Sequences</a></li>
                 </ul>
             </div>
-            <div class="tab-content ">
+            <div class="tab-content" style="min-height:700px;">
                 <section  class="tab-pane active" id="overview">
-                    <div class="four-column">
-                        <section class="" id="divMap">
-                            <div id="expertDistroDiv" style="display:none;margin-bottom: 10px;">
-                                <h2>Compiled distribution map</h2>
-                                <img id="distroMapImage" src="${resource(dir: 'images', file: 'noImage.jpg')}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>
-                                <div class="mapAttribution">Compiled distribution map provided by <span id="dataResource">[data resource not known]</span></div>
-                            </div>
-                            <h2>Occurrence records map</h2>
-                            <div class="bg-white">
-                                <g:set var="spatialQuery" value="lsid:%22${guid}%22%20AND%20geospatial_kosher:true"/>
-                                <img id="mapImage" src="http://biocache.ala.org.au/ws/density/map?q=${spatialQuery}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>
-                                <img id="mapLegend" src="http://biocache.ala.org.au/ws/density/legend?q=${spatialQuery}" class="distroLegend" alt="map legend" onerror="this.style.display='none'"/>
-                            </div>
-                            <p>
-                                <a class="btn" href="${biocacheUrl}/occurrences/taxa/${guid}" title="View records list">View records list</a>
-                                <a class="btn" href="${spatialPortalUrl}/?q=lsid:%22${guid}%22&cm=geospatial_kosher" title="Map & analyse records">Map &amp; analyse records</a>
-                            </p>
-                        </section>
-                        <section class="" id="overviewImage">
-                            <ul class="overviewImages">
-                                <g:if test="${extraImages}">
-                                    <g:set var="imageSearchUrl" value="${createLink(controller:'image-search', action: 'showSpecies', params:[taxonRank: tc?.taxonConcept?.rankString, scientificName: tc?.taxonConcept?.nameString])}" />
-                                    <li>
-                                        <a href="${imageSearchUrl}" class="btn">
-                                            View images of species for ${sciNameFormatted}</a>
-                                    </li>
-                                </g:if>
-                                <g:if test="${tc.taxonConcept?.rankID && tc.taxonConcept?.rankID < 7000}">%{-- higher taxa show mulitple images --}%
-                                    <g:set var="imageLimit" value="${3}"/>
-                                    <g:set var="imageSize" value="150"/>
-                                    <g:each in="${extraImages?.searchDTOList}" var="searchTaxon" status="status">
-                                        <g:set var="imageSrc" value="${searchTaxon.smallImageUrl}"/>
-                                        <g:if test="${status < imageLimit}">
-                                            <li>
-                                                <a href="${imageSearchUrl}" class="thumbImageBrowse" title="Browse images of species for ${sciNameFormatted}">
-                                                    <img src="${searchTaxon.smallImageUrl?:searchTaxon.thumbnail}" class="overviewImage"  style="width:100%;max-width:314px;"/>
-                                                </a>
-                                            </li>
-                                        </g:if>
-                                    </g:each>
-                                </g:if>
-                                <g:else>
-                                    <g:set var="imageSize" value="314"/>
-                                    <g:set var="gotOne" value="${false}"/>
-                                <%--Iterate over images and check image is not black listed--%>
-                                    <g:each var="image" in="${tc.images}" status="status">
-                                        <g:if test="${!image.isBlackListed && !gotOne}">
-                                            <g:set var="gotOne" value="${true}"/>
-                                            <g:set var="imageSrc" value="${image.smallImageUrl?:image.repoLocation?.replace('/raw.', '/smallRaw.')}"/>
-                                            <li>
-                                                <a href="${image.repoLocation}" id="thumb0" class="thumbImage"
-                                                   title="Species representative photo"><img src="${image.smallImageUrl}"
-                                                                                             class="overviewImage"
-                                                                                             style="width:100%;max-width:${imageSize}px"
-                                                                                             alt="representative image of taxa" /></a>
-                                                <cite>
-                                                    <g:if test="${image.licence}">
-                                                        <br/>Source: ${image.infoSourceName}
-                                                    </g:if>
-                                                    <g:if test="${image.creator}">
-                                                        <br/>Image by: <bie:lookupUserName id="${image.creator}"/>
-                                                    </g:if>
-                                                    <g:if test="${image.rights}">
-                                                        <br/>Rights: ${image.rights}
-                                                    </g:if>
-                                                    <g:if test="${false && image.licence}">
-                                                        <br/>Licence: ${image.licence}
-                                                    </g:if>
-                                                </cite>
-                                            </li>
-                                        </g:if>
-                                    </g:each>
-                                </g:else>
-                            </ul>
-                        </section>
+                    <div class="row-fluid" >
+                        <div class="span6">
+                                <div id="noOverviewImages" class="row-fluid" style="height:400px;">
+                                    <div class="span12" style="background-color:#d3d3d3; width:100%; padding: 30px; border-radius: 5px; text-align: center; height:100%;">
+                                        <h3>No images available</h3>
+                                    </div>
+                                </div>
 
-                        <section id="sounds">
-                        </section>
+                                <div id="overviewImages" class="row-fluid hide">
+                                    <div class="span8">
+                                        <img id="mainOverviewImage" src=""/>
+                                        <p id="mainOverviewImageInfo" style="background-color:#f0f0e8; padding:10px;">
+                                            Image metadata here
+                                        </p>
+                                    </div>
+                                    <div class="span4">
+                                        <img id="secondOverviewImage" style="margin-bottom:10px;" src=""/>
+                                        <br/>
+                                        <img id="thirdOverviewImage" src=""/>
+                                    </div>
+                                </div>
+
+                                %{--<br/>--}%
+                                %{----}%
+                                %{--<ul class="overviewImages">--}%
+                                    %{--<g:if test="${extraImages}">--}%
+                                        %{--<g:set var="imageSearchUrl" value="${createLink(controller:'image-search', action: 'showSpecies', params:[taxonRank: tc?.taxonConcept?.rankString, scientificName: tc?.taxonConcept?.nameString])}" />--}%
+                                        %{--<li>--}%
+                                            %{--<a href="${imageSearchUrl}" class="btn">View images of species for ${sciNameFormatted}</a>--}%
+                                        %{--</li>--}%
+                                    %{--</g:if>--}%
+                                    %{--<g:if test="${tc.taxonConcept?.rankID && tc.taxonConcept?.rankID < 7000}">--}%%{-- higher taxa show mulitple images --}%
+                                        %{--<g:set var="imageLimit" value="${3}"/>--}%
+                                        %{--<g:set var="imageSize" value="150"/>--}%
+                                        %{--<g:each in="${extraImages?.searchDTOList}" var="searchTaxon" status="status">--}%
+                                            %{--<g:set var="imageSrc" value="${searchTaxon.smallImageUrl}"/>--}%
+                                            %{--<g:if test="${status < imageLimit}">--}%
+                                                %{--<li>--}%
+                                                    %{--<a href="${imageSearchUrl}" class="thumbImageBrowse" title="Browse images of species for ${sciNameFormatted}">--}%
+                                                        %{--<img src="${searchTaxon.smallImageUrl?:searchTaxon.thumbnail}" class="overviewImage"  style="width:100%;max-width:314px;"/>--}%
+                                                    %{--</a>--}%
+                                                %{--</li>--}%
+                                            %{--</g:if>--}%
+                                        %{--</g:each>--}%
+                                    %{--</g:if>--}%
+                                    %{--<g:else>--}%
+                                        %{--<g:set var="imageSize" value="314"/>--}%
+                                        %{--<g:set var="gotOne" value="${false}"/>--}%
+                                        %{--<g:each var="image" in="${tc.images}" status="status">--}%
+                                            %{--<g:if test="${!image.isBlackListed && !gotOne}">--}%
+                                                %{--<g:set var="gotOne" value="${true}"/>--}%
+                                                %{--<g:set var="imageSrc" value="${image.smallImageUrl?:image.repoLocation?.replace('/raw.', '/smallRaw.')}"/>--}%
+                                                %{--<li>--}%
+                                                    %{--<a href="${image.repoLocation}" id="thumb0" class="thumbImage"--}%
+                                                       %{--title="Species representative photo"><img src="${image.smallImageUrl}"--}%
+                                                                                                 %{--class="overviewImage"--}%
+                                                                                                 %{--style="width:100%;max-width:${imageSize}px"--}%
+                                                                                                 %{--alt="representative image of taxa" /></a>--}%
+                                                    %{--<cite>--}%
+                                                        %{--<g:if test="${image.licence}">--}%
+                                                            %{--<br/>Source: ${image.infoSourceName}--}%
+                                                        %{--</g:if>--}%
+                                                        %{--<g:if test="${image.creator}">--}%
+                                                            %{--<br/>Image by: <bie:lookupUserName id="${image.creator}"/>--}%
+                                                        %{--</g:if>--}%
+                                                        %{--<g:if test="${image.rights}">--}%
+                                                            %{--<br/>Rights: ${image.rights}--}%
+                                                        %{--</g:if>--}%
+                                                        %{--<g:if test="${false && image.licence}">--}%
+                                                            %{--<br/>Licence: ${image.licence}--}%
+                                                        %{--</g:if>--}%
+                                                    %{--</cite>--}%
+                                                %{--</li>--}%
+                                            %{--</g:if>--}%
+                                        %{--</g:each>--}%
+                                    %{--</g:else>--}%
+                                %{--</ul>--}%
+                        </div>
+                        <div class="span6">
+                            <div id="leafletMap" style="height:500px;  border-radius: 5px;"> </div>
+
+                                %{--<div id="expertDistroDiv" style="display:none;margin-bottom: 10px;">--}%
+                                    %{--<h2>Compiled distribution map</h2>--}%
+                                    %{--<img id="distroMapImage" src="${resource(dir: 'images', file: 'noImage.jpg')}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>--}%
+                                    %{--<div class="mapAttribution">Compiled distribution map provided by <span id="dataResource">[data resource not known]</span></div>--}%
+                                %{--</div>--}%
+                                %{--<h2>Occurrence records map</h2>--}%
+
+
+                                %{--<div class="bg-white">--}%
+                                    %{--<g:set var="spatialQuery" value="lsid:%22${guid}%22%20AND%20geospatial_kosher:true"/>--}%
+                                    %{--<img id="mapImage" src="http://biocache.ala.org.au/ws/density/map?q=${spatialQuery}" class="distroImg" style="width:316px;" alt="occurrence map" onerror="this.style.display='none'"/>--}%
+                                    %{--<img id="mapLegend" src="http://biocache.ala.org.au/ws/density/legend?q=${spatialQuery}" class="distroLegend" alt="map legend" onerror="this.style.display='none'"/>--}%
+                                %{--</div>--}%
+                                %{--<p>--}%
+                                    %{--<a class="btn" href="${biocacheUrl}/occurrences/taxa/${guid}" title="View records list">View records list</a>--}%
+                                    %{--<a class="btn" href="${spatialPortalUrl}/?q=lsid:%22${guid}%22&cm=geospatial_kosher" title="Map & analyse records">Map &amp; analyse records</a>--}%
+                                %{--</p>--}%
+                        </div>
                     </div>
+                </section>
+                <section id="sounds">
+                </section>
                     <div class="clearfix"></div>
                     <g:set var="descriptionBlock">
                         <g:set var="counter" value="${0}"/>
@@ -603,9 +563,6 @@
                                         </g:if>
                                     </g:if>
                                 </g:if>
-                                <g:else>
-                                    <div id='cnRank-${fName}' class="rankCommonName">Read Only Mode</div>
-                                </g:else>
                             </td>
                             <td class="source">
                                 <ul>
@@ -675,7 +632,7 @@
                 <section class="tab-pane" id="records">
                     <h2>Occurrence records</h2>
                     <div id="occurrenceRecords">
-                        <p><a href="${biocacheUrl}/occurrences/taxa/${guid}">View
+                        <p><a href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString?:''}">View
                         list of all <span id="occurenceCount"></span> occurrence records for this taxon</a></p>
                         <div id="recordBreakdowns" style="display: block;">
                             <h2>Charts showing breakdown of occurrence records</h2>
@@ -738,14 +695,160 @@
         </div><!--col-wide last-->
     </div><!--inner-->
 
-    <r:script>
-
-
-
-
-
-
-    </r:script>
-
 </body>
+
+
+<style type="text/css">
+
+#leafletMap {
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+#leafletMap, input {
+    margin: 0px;
+}
+
+.leaflet-control-layers-base  {
+    font-size: 12px;
+}
+
+.leaflet-control-layers-base label,  .leaflet-control-layers-base input, .leaflet-control-layers-base button, .leaflet-control-layers-base select, .leaflet-control-layers-base textarea {
+    margin:0px;
+    height:20px;
+    font-size: 12px;
+    line-height:18px;
+    width:auto;
+}
+
+.leaflet-control-layers {
+    opacity:0.8;
+    filter:alpha(opacity=80);
+}
+
+.leaflet-control-layers-overlays label {
+    font-size: 12px;
+    line-height: 18px;
+    margin-bottom: 0px;
+}
+
+.leaflet-drag-target {
+    line-height:18px;
+    font-size: 12px;
+}
+
+i.legendColour {
+    -webkit-background-clip: border-box;
+    -webkit-background-origin: padding-box;
+    -webkit-background-size: auto;
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-image: none;
+    background-origin: padding-box;
+    background-size: auto;
+    display: inline-block;
+    height: 12px;
+    line-height: 12px;
+    width: 14px;
+    margin-bottom: -5px;
+    margin-left:2px;
+    margin-right:2px;
+    opacity:1;
+    filter:alpha(opacity=100);
+}
+
+i#defaultLegendColour {
+    margin-bottom: -2px;
+    margin-left: 2px;
+    margin-right: 5px;
+}
+
+.legendTable {
+    padding: 0px;
+    margin: 0px;
+}
+
+a.colour-by-legend-toggle {
+    color: #000000;
+    text-decoration: none;
+    cursor: auto;
+    display: block;
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 18px;
+    text-decoration: none solid rgb(0, 120, 168);
+    padding:6px 10px 6px 10px;
+}
+
+#mapLayerControls label {
+    margin-bottom: 0;
+}
+
+/*#mapLayerControls input[type="checkbox"] {*/
+/*margin-top: 0;*/
+/*}*/
+
+.leaflet-bar-bg a,
+.leaflet-bar-bg a:hover {
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+}
+
+.leaflet-bar-bg .fa {
+    line-height: 36px;
+    opacity: 0.8;
+}
+#mapLayerControls {
+    /*position: absolute;*/
+    /*width: 80%;*/
+    /*z-index: 1010;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    height: 30px;
+    /*margin: 10px auto;*/
+    /*background: rgba(0,0,0,0.4);*/
+    /* box-shadow: -2px 0 2px rgba(0,0,0,0.3); */
+    /*box-shadow: 0 1px 5px rgba(0,0,0,0.4);*/
+    /*-webkit-border-radius: 5px;*/
+    /*-moz-border-radius: 5px;*/
+    /*border-radius: 5px;*/
+    color: #000;
+    font-size: 13px;
+}
+#mapLayerControls .layerControls, #mapLayerControls #sizeslider {
+    display: inline-block;
+    float: none;
+}
+#mapLayerControls td {
+    padding: 2px 5px 0px 5px;
+}
+#mapLayerControls label {
+    padding-top: 4px;
+}
+#mapLayerControls .slider {
+    margin-bottom: 4px;
+}
+#mapLayerControls select {
+    color: #000;
+    background: #EEEEEE;
+    /*-moz-user-select: auto;*/
+}
+#mapLayerControls .layerControls {
+    margin-top: 0;
+}
+#outlineDots {
+    height: 20px;
+}
+#recordLayerControl {
+    padding: 0 5px;
+}
+
+</style>
+
 </html>

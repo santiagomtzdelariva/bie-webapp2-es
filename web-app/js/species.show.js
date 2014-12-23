@@ -25,7 +25,11 @@
 /**
  * jQuery page onload callback
  */
-$(document).ready(function() {
+function showSpeciesPage() {
+
+    console.log("Starting showSpeciesPage");
+    console.log(SHOW_CONF);
+
     var bhlInit = false;
     var galleryInit = false;
     $('a[data-toggle="tab"]').on('shown', function(e) {
@@ -77,7 +81,7 @@ $(document).ready(function() {
                 var contentElement = $(this).find('.detail').clone();
                 var uuid = $(this).data('occurrenceuid');
                 $('#' + uuid).remove(); // clear previous data
-                var extraData = '<div class="rights">&nbsp;</div><div class="recordLink"><a href="http://biocache.ala.org.au/occurrences/' + uuid + '">View details of this record</a></div>';
+                var extraData = '<div class="rights">&nbsp;</div><div class="recordLink"><a href="' + SHOW_CONF.biocacheUrl + '/occurrences/' + uuid + '">View details of this record</a></div>';
                 contentElement.attr('id', $(this).data('id'));
                 contentElement.append(extraData);
                 //console.log("contentElement", contentElement.html(), uuid);
@@ -91,7 +95,7 @@ $(document).ready(function() {
 
                 // load extra data via JSON GET
                 if (uuid) {
-                    var url = SHOW_CONF.biocacheUrl + "/ws/occurrences/" + uuid + ".json?callback=?";
+                    var url = SHOW_CONF.biocacheServiceUrl + "/occurrences/" + uuid + ".json?callback=?";
                     //console.log('occurrenceUid', occurrenceUid, url);
                     $.ajax({
                         url: url,
@@ -129,21 +133,27 @@ $(document).ready(function() {
         fitToView: false
     });
 
-
     // Charts via collectory charts.js
     var chartOptions = {
-        query: "lsid:" + SHOW_CONF.guid,
+        query: SHOW_CONF.scientificName,
+        biocacheServicesUrl: SHOW_CONF.biocacheServiceUrl,
+        collectionsUrl: SHOW_CONF.collectoryUrl,
         totalRecordsSelector: "span#occurenceCount",
         chartsDiv: "recordBreakdowns",
         error: chartsError,
         width: 540,
         charts: ['collection_uid','state','month','occurrence_year'],
-        collection_uid: {title: 'By collection',  backgroundColor: '#FFFEF7'},
-        state: {title: 'By state & territory', backgroundColor: '#FFFEF7'},
-        month: {chartType: "column", backgroundColor: '#FFFEF7'},
-        occurrence_year: {chartType: "column", backgroundColor: '#FFFEF7'},
-        backgroundColor: '#FFFEF7'
-    }
+        collection_uid: {title: 'By collection'},
+        state: {title: 'By state & territory'},
+        month: {chartType: "column"},
+        occurrence_year: {chartType: "column"}
+    };
+
+    console.log("Charts showSpeciesPage");
+    console.log(SHOW_CONF);
+    console.log("chartOptions");
+    console.log(chartOptions);
+
 
     loadFacetCharts(chartOptions);
     //facetChartGroup.loadAndDrawFacetCharts(chartOptions);
@@ -176,10 +186,12 @@ $(document).ready(function() {
     // add expert distrobution map
     addExpertDistroMap();
 
+    loadOverviewImages();
+
     //Trove search results
     setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
 
-}); // end document.ready
+}
 
 function chartsError() {
     $("#chartsError").html("An error occurred and charts cannot be displayed at this time.");
@@ -194,6 +206,41 @@ function loadGalleries() {
     loadGalleryType('type', 0)
     loadGalleryType('specimen', 0)
     loadGalleryType('other', 0)
+}
+
+function loadOverviewImages(){
+
+    //TODO a toggle between LSID based searches and names searches
+    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=' +
+        SHOW_CONF.scientificName +
+        '&fq=multimedia:"Image"&facet=off&pageSize=4&start=0&callback=?';
+
+    $.getJSON(url, function(data){
+        if (data && data.totalRecords > 0) {
+
+            $('#noOverviewImages').addClass('hide');
+
+            var $categoryTmpl = $('#overviewImages');
+            $categoryTmpl.removeClass('hide');
+
+            var $mainOverviewImage = $('#mainOverviewImage');
+            $mainOverviewImage.attr('src', data.occurrences[0].largeImageUrl);
+            $('#mainOverviewImageInfo').html(data.occurrences[0].dataResourceName);
+
+            var $secondOverviewImage = $('#secondOverviewImage');
+            $secondOverviewImage.attr('src', data.occurrences[1].smallImageUrl);
+
+            var $thirdOverviewImage = $('#thirdOverviewImage');
+            $thirdOverviewImage.attr('src', data.occurrences[2].smallImageUrl);
+        }
+    }).fail(function(jqxhr, textStatus, error) {
+        alert('Error loading gallery: ' + textStatus + ', ' + error);
+    }).always(function() {
+        $('#gallerySpinner').hide();
+    });
+
+
+
 }
 
 /**
@@ -219,8 +266,14 @@ function loadGalleryType(category, start) {
         $('.loadMore.' + category + ' img').removeClass('hide');
     }
 
-    var url = SHOW_CONF.biocacheUrl  + '/ws/occurrences/search.json?q=lsid:' + SHOW_CONF.guid
-        + '&fq=multimedia:"Image"&pageSize=' + pageSize + '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
+    //TODO a toggle between LSID based searches and names searches
+    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=' +
+        SHOW_CONF.scientificName +
+        '&fq=multimedia:"Image"&pageSize=' + pageSize +
+        '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
+
+//    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=lsid:' + SHOW_CONF.guid
+//        + '&fq=multimedia:"Image"&pageSize=' + pageSize + '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
 
     $.getJSON(url, function(data){
         if (data && data.totalRecords > 0) {

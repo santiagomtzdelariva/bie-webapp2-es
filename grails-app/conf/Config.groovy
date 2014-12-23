@@ -1,19 +1,23 @@
-//locations to search for config files that get merged into the main config
-//config files can either be Java properties files or ConfigSlurper scripts
-def appName = "bie-webapp2"
-grails.project.groupId = "au.org.ala" // change this to alter the default package name and Maven publishing destination
-appContext = grails.util.Metadata.current.'app.name'
-
-grails.config.locations = [ "classpath:${appName}-config.properties",
-                             "classpath:${appName}-config.groovy",
-                             "file:${userHome}/.grails/${appName}-config.properties",
-                             "file:/data/${appName}/config/${appName}-config.groovy",
-]
-
-if (System.properties["${appName}.config.location"]) {
-    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+def appName = 'bie-webapp2'
+def ENV_NAME = "${appName.toUpperCase()}_CONFIG"
+default_config = "/data/${appName}/config/${appName}-config.properties"
+if(!grails.config.locations || !(grails.config.locations instanceof List)) {
+    grails.config.locations = []
+}
+if(System.getenv(ENV_NAME) && new File(System.getenv(ENV_NAME)).exists()) {
+    println "[${appName}] Including configuration file specified in environment: " + System.getenv(ENV_NAME);
+    grails.config.locations.add "file:" + System.getenv(ENV_NAME)
+} else if(System.getProperty(ENV_NAME) && new File(System.getProperty(ENV_NAME)).exists()) {
+    println "[${appName}] Including configuration file specified on command line: " + System.getProperty(ENV_NAME);
+    grails.config.locations.add "file:" + System.getProperty(ENV_NAME)
+} else if(new File(default_config).exists()) {
+    println "[${appName}] Including default configuration file: " + default_config;
+    grails.config.locations.add "file:" + default_config
+} else {
+    println "[${appName}] No external configuration file defined."
 }
 
+grails.project.groupId = 'au.org.ala'
 /******************************************************************************\
  *  EXTERNAL SERVERS
  \******************************************************************************/
@@ -98,6 +102,10 @@ if(!security.cas.bypass){
 if(!auth.admin_role){
     auth.admin_role = "ROLE_ADMIN"
 }
+if(!skin.layout){
+    skin.layout = "generic"
+}
+
 
 nonTruncatedSources = ["http://www.environment.gov.au/biodiversity/abrs/online-resources/flora/main/index.html"]
 
@@ -172,7 +180,7 @@ environments {
         grails.host = "http://dev.ala.org.au"
         grails.serverURL = "${grails.host}:8080/${appName}"
         //bie.baseURL = grails.serverURL
-        security.cas.appServerName = "${grails.host}:8080"
+        security.cas.appServerName = "${grails.host}:8090"
         security.cas.contextPath = "/${appName}"
         // cached-resources plugin - keeps original filenames but adds cache-busting params
         grails.resources.debug = true
@@ -196,7 +204,7 @@ environments {
     }
 }
 
-logging.dir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs'  : '/var/log/tomcat6')
+logging_dir = (System.getProperty('catalina.base') ? System.getProperty('catalina.base') + '/logs'  : '/var/log/tomcat6')
 
 // log4j configuration
 log4j = {
@@ -205,12 +213,12 @@ log4j = {
             production {
                 rollingFile name: "bie-prod",
                     maxFileSize: 104857600,
-                    file: logging.dir + "/biewebapp2.log",
+                    file: logging_dir + "/bie.log",
                     threshold: org.apache.log4j.Level.DEBUG,
                     layout: pattern(conversionPattern: "%-5p: %d [%c{1}]  %m%n")
                 rollingFile name: "stacktrace",
                     maxFileSize: 1024,
-                    file: logging.dir + "/biewebapp2-stacktrace.log"
+                    file: logging_dir + "/bie-stacktrace.log"
             }
             development{
                 console name: "stdout", layout: pattern(conversionPattern: "%d %-5p [%c{1}]  %m%n"),

@@ -25,8 +25,9 @@
 <html>
 <head>
     <title><g:if test="${params.scientificName}">${params.taxonRank}  ${params.scientificName} | </g:if> Image browser | Atlas of Living Australia</title>
-    <meta name="layout" content="main" />
-    <meta name="fluidLayout" content="${true}" />
+    <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
+    %{--<meta name="fluidLayout" content="${true}" />--}%
+    <meta name="fluidLayout" content="true" />
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'colorbox.css')}" type="text/css" media="screen" />
     <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.colorbox-min.js')}"></script>
     <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.tools.min.js')}"></script>
