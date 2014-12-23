@@ -180,7 +180,7 @@
                 </div>
             </div>
             <hgroup class="row-fluid">
-                <div class="span8">
+                <div class="span9">
                     <h1><bie:formatSciName name="${tc?.taxonConcept?.nameString}" rankId="${tc?.taxonConcept?.rankID?:0}"/>
                         <span>${tc?.taxonConcept?.author?:""}</span>
                     </h1>
@@ -189,7 +189,7 @@
                     </g:if>
                     <h4>Name authority: ${tc?.taxonConcept.infoSourceName}</h4>
                 </div>
-                <div class="span4" id="actionButtons">
+                <div class="span3" id="actionButtons">
                     <a href="${citizenSciUrl}${guid}" class="btn btn-ala" title="Record a sighting">Record a sighting</a>
                     <a id="alertsButton" class="btn btn-ala" href="#">Alerts <i class="icon-bell"></i></a>
                 </div>
@@ -290,6 +290,8 @@
                         </div>
                         <div class="span6">
                             <div id="leafletMap" style="height:500px;  border-radius: 5px;"> </div>
+                            <a href="#" class="btn btn-large  pull-right">View Interactive Map</a>
+                            <a href="#" class="btn btn-large  pull-right">View Locations</a>
 
                                 %{--<div id="expertDistroDiv" style="display:none;margin-bottom: 10px;">--}%
                                     %{--<h2>Compiled distribution map</h2>--}%

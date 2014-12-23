@@ -138,7 +138,7 @@
                                                 <g:elseif test="${fieldResult.label?.isEmpty()}">
                                                 </g:elseif>
                                                 <g:else>
-                                                    <li><a href="?${request.queryString}&fq=${facetResult.fieldName}:${fieldResult.label}">
+                                                    <li><a href="?${request.queryString}&fq=${facetResult.fieldName}:%22${fieldResult.label}%22">
                                                         <g:message code="${facetResult.fieldName}.${fieldResult.label}" default="${fieldResult.label?:"[unknown]"}"/>
                                                     </a>
                                                         (<g:formatNumber number="${fieldResult.count}" type="number"/>)
