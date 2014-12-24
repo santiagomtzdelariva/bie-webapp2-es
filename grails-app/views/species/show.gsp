@@ -1,5 +1,5 @@
 %{--
-  - Copyright (C) 2012 Atlas of Living Australia
+  - Copyright (C) 2014 Atlas of Living Australia
   - All Rights Reserved.
   -
   - The contents of this file are subject to the Mozilla Public
@@ -12,12 +12,6 @@
   - implied. See the License for the specific language governing
   - rights and limitations under the License.
   --}%
-<%--
-  Species "show" view
-  User: nick
-  Date: 17/05/12
-  Time: 11:10 AM
---%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <g:set var="alaUrl" value="${grailsApplication.config.ala.baseURL}"/>
 <g:set var="biocacheUrl" value="${grailsApplication.config.biocache.baseURL}"/>
@@ -34,7 +28,6 @@
     <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
     <meta name="fluidLayout" content="${true}" />
     <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | ${raw(grailsApplication.config.skin.orgNameLong)}</title>
-    %{--<script src="http://leafletjs.com/dist/leaflet.js"></script>--}%
     <r:script disposition='head'>
         // global var to pass GSP vars into JS file
         var SHOW_CONF = {
@@ -116,13 +109,6 @@
 
             showSpeciesPage();
         })
-
-        function loadExternalReferences(){
-
-
-
-
-        }
 
         function loadMap() {
 
@@ -242,84 +228,29 @@
                 <section  class="tab-pane active" id="overview">
                     <div class="row-fluid" >
                         <div class="span6">
-                                <div id="noOverviewImages" class="row-fluid" style="height:400px;">
-                                    <div class="span12" style="background-color:#d3d3d3; width:100%; padding: 30px; border-radius: 5px; text-align: center; height:100%;">
-                                        <h3>No images available</h3>
-                                    </div>
+                            <div id="noOverviewImages" class="row-fluid" style="height:400px;">
+                                <div class="span12" style="background-color:#d3d3d3; width:100%; padding: 30px; border-radius: 5px; text-align: center; height:100%;">
+                                    <h3>No images available</h3>
                                 </div>
+                            </div>
 
-                                <div id="overviewImages" class="row-fluid hide">
-                                    <div class="span8">
-                                        <img id="mainOverviewImage" src=""/>
-                                        <p id="mainOverviewImageInfo" style="background-color:#f0f0e8; padding:10px;">
-                                            Image metadata here
-                                        </p>
-                                    </div>
-                                    <div class="span4">
-                                        <img id="secondOverviewImage" style="margin-bottom:10px;" src=""/>
-                                        <br/>
-                                        <img id="thirdOverviewImage" src=""/>
-                                    </div>
+                            <div id="overviewImages" class="row-fluid hide">
+                                <div class="span8">
+                                    <img id="mainOverviewImage" src=""/>
+                                    <p id="mainOverviewImageInfo" style="background-color:#f0f0e8; padding:10px;">
+                                        Image metadata here
+                                    </p>
                                 </div>
-
-                                <div id="descriptiveContent">
+                                <div class="span4">
+                                    <img id="secondOverviewImage" style="margin-bottom:10px;" src=""/>
+                                    <br/>
+                                    <img id="thirdOverviewImage" src=""/>
                                 </div>
+                            </div>
 
-                                %{--<br/>--}%
-                                %{----}%
-                                %{--<ul class="overviewImages">--}%
-                                    %{--<g:if test="${extraImages}">--}%
-                                        %{--<g:set var="imageSearchUrl" value="${createLink(controller:'image-search', action: 'showSpecies', params:[taxonRank: tc?.taxonConcept?.rankString, scientificName: tc?.taxonConcept?.nameString])}" />--}%
-                                        %{--<li>--}%
-                                            %{--<a href="${imageSearchUrl}" class="btn">View images of species for ${sciNameFormatted}</a>--}%
-                                        %{--</li>--}%
-                                    %{--</g:if>--}%
-                                    %{--<g:if test="${tc.taxonConcept?.rankID && tc.taxonConcept?.rankID < 7000}">--}%%{-- higher taxa show mulitple images --}%
-                                        %{--<g:set var="imageLimit" value="${3}"/>--}%
-                                        %{--<g:set var="imageSize" value="150"/>--}%
-                                        %{--<g:each in="${extraImages?.searchDTOList}" var="searchTaxon" status="status">--}%
-                                            %{--<g:set var="imageSrc" value="${searchTaxon.smallImageUrl}"/>--}%
-                                            %{--<g:if test="${status < imageLimit}">--}%
-                                                %{--<li>--}%
-                                                    %{--<a href="${imageSearchUrl}" class="thumbImageBrowse" title="Browse images of species for ${sciNameFormatted}">--}%
-                                                        %{--<img src="${searchTaxon.smallImageUrl?:searchTaxon.thumbnail}" class="overviewImage"  style="width:100%;max-width:314px;"/>--}%
-                                                    %{--</a>--}%
-                                                %{--</li>--}%
-                                            %{--</g:if>--}%
-                                        %{--</g:each>--}%
-                                    %{--</g:if>--}%
-                                    %{--<g:else>--}%
-                                        %{--<g:set var="imageSize" value="314"/>--}%
-                                        %{--<g:set var="gotOne" value="${false}"/>--}%
-                                        %{--<g:each var="image" in="${tc.images}" status="status">--}%
-                                            %{--<g:if test="${!image.isBlackListed && !gotOne}">--}%
-                                                %{--<g:set var="gotOne" value="${true}"/>--}%
-                                                %{--<g:set var="imageSrc" value="${image.smallImageUrl?:image.repoLocation?.replace('/raw.', '/smallRaw.')}"/>--}%
-                                                %{--<li>--}%
-                                                    %{--<a href="${image.repoLocation}" id="thumb0" class="thumbImage"--}%
-                                                       %{--title="Species representative photo"><img src="${image.smallImageUrl}"--}%
-                                                                                                 %{--class="overviewImage"--}%
-                                                                                                 %{--style="width:100%;max-width:${imageSize}px"--}%
-                                                                                                 %{--alt="representative image of taxa" /></a>--}%
-                                                    %{--<cite>--}%
-                                                        %{--<g:if test="${image.licence}">--}%
-                                                            %{--<br/>Source: ${image.infoSourceName}--}%
-                                                        %{--</g:if>--}%
-                                                        %{--<g:if test="${image.creator}">--}%
-                                                            %{--<br/>Image by: <bie:lookupUserName id="${image.creator}"/>--}%
-                                                        %{--</g:if>--}%
-                                                        %{--<g:if test="${image.rights}">--}%
-                                                            %{--<br/>Rights: ${image.rights}--}%
-                                                        %{--</g:if>--}%
-                                                        %{--<g:if test="${false && image.licence}">--}%
-                                                            %{--<br/>Licence: ${image.licence}--}%
-                                                        %{--</g:if>--}%
-                                                    %{--</cite>--}%
-                                                %{--</li>--}%
-                                            %{--</g:if>--}%
-                                        %{--</g:each>--}%
-                                    %{--</g:else>--}%
-                                %{--</ul>--}%
+                            <div id="descriptiveContent">
+                                %{--Content added by jquery>--}%
+                            </div>
                         </div>
                         <div class="span6">
                             <div id="leafletMap" style="height:500px;  border-radius: 5px;"> </div>
@@ -489,9 +420,6 @@
                                 </g:each>
                             </div>
                         </g:if>
-                        %{--<g:if test="${!tc.screenshotImages && !(typeImages || otherImages || specimenImages)}">--}%
-                            %{--<p>There are no images for this taxon</p>--}%
-                        %{--</g:if>--}%
                     </section><!--#gallery-->
                 </g:if>
 
@@ -568,7 +496,7 @@
                         <%-- special treatment for <div> id and cookie name/value. matchup with Ranking Controller.rankTaxonCommonNameByUser --%>
                         <g:set var="nkey" value="${cn.key}" />
                         <g:set var="fName" value="${nkey?.trim()?.hashCode()}" />
-                        <%-- javascript treatment: manual translate special charater, because string:encodeURL cannot handle non-english character --%>
+                        <%-- javascript treatment: manual translate special character, because string:encodeURL cannot handle non-english character --%>
                         <g:set var="enKey" value="${nkey?.encodeAsJavaScript()}" />
                         <tr>
                             <td>
@@ -717,171 +645,16 @@
         </div><!--col-wide last-->
     </div><!--inner-->
 
-<div id="descriptionTemplate" class="well">
-    <h4 class="title"></h4>
-    <p class="content"></p>
-    <cite class="citation">
-        <a class="sourceLink" href=""></a><br/>
-        <span class="rights"></span><br/>
-        <a href="" class="providedBy"></a>
-    </cite>
-</div>
-
+    <div id="descriptionTemplate" class="well">
+        <h4 class="title"></h4>
+        <p class="content"></p>
+        <cite class="citation">
+            <a class="sourceLink" href=""></a><br/>
+            <span class="rights"></span><br/>
+            <a href="" class="providedBy"></a>
+        </cite>
+    </div>
 
 </body>
-
-
-<style type="text/css">
-
-#leafletMap {
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 18px;
-}
-
-#leafletMap, input {
-    margin: 0px;
-}
-
-.leaflet-control-layers-base  {
-    font-size: 12px;
-}
-
-.leaflet-control-layers-base label,  .leaflet-control-layers-base input, .leaflet-control-layers-base button, .leaflet-control-layers-base select, .leaflet-control-layers-base textarea {
-    margin:0px;
-    height:20px;
-    font-size: 12px;
-    line-height:18px;
-    width:auto;
-}
-
-.leaflet-control-layers {
-    opacity:0.8;
-    filter:alpha(opacity=80);
-}
-
-.leaflet-control-layers-overlays label {
-    font-size: 12px;
-    line-height: 18px;
-    margin-bottom: 0px;
-}
-
-.leaflet-drag-target {
-    line-height:18px;
-    font-size: 12px;
-}
-
-i.legendColour {
-    -webkit-background-clip: border-box;
-    -webkit-background-origin: padding-box;
-    -webkit-background-size: auto;
-    background-attachment: scroll;
-    background-clip: border-box;
-    background-image: none;
-    background-origin: padding-box;
-    background-size: auto;
-    display: inline-block;
-    height: 12px;
-    line-height: 12px;
-    width: 14px;
-    margin-bottom: -5px;
-    margin-left:2px;
-    margin-right:2px;
-    opacity:1;
-    filter:alpha(opacity=100);
-}
-
-i#defaultLegendColour {
-    margin-bottom: -2px;
-    margin-left: 2px;
-    margin-right: 5px;
-}
-
-.legendTable {
-    padding: 0px;
-    margin: 0px;
-}
-
-a.colour-by-legend-toggle {
-    color: #000000;
-    text-decoration: none;
-    cursor: auto;
-    display: block;
-    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: normal;
-    line-height: 18px;
-    text-decoration: none solid rgb(0, 120, 168);
-    padding:6px 10px 6px 10px;
-}
-
-#mapLayerControls label {
-    margin-bottom: 0;
-}
-
-/*#mapLayerControls input[type="checkbox"] {*/
-/*margin-top: 0;*/
-/*}*/
-
-.leaflet-bar-bg a,
-.leaflet-bar-bg a:hover {
-    width: 36px;
-    height: 36px;
-    line-height: 36px;
-}
-
-.leaflet-bar-bg .fa {
-    line-height: 36px;
-    opacity: 0.8;
-}
-#mapLayerControls {
-    /*position: absolute;*/
-    /*width: 80%;*/
-    /*z-index: 1010;*/
-    /*top: 0;*/
-    /*left: 0;*/
-    /*right: 0;*/
-    height: 30px;
-    /*margin: 10px auto;*/
-    /*background: rgba(0,0,0,0.4);*/
-    /* box-shadow: -2px 0 2px rgba(0,0,0,0.3); */
-    /*box-shadow: 0 1px 5px rgba(0,0,0,0.4);*/
-    /*-webkit-border-radius: 5px;*/
-    /*-moz-border-radius: 5px;*/
-    /*border-radius: 5px;*/
-    color: #000;
-    font-size: 13px;
-}
-#mapLayerControls .layerControls, #mapLayerControls #sizeslider {
-    display: inline-block;
-    float: none;
-}
-#mapLayerControls td {
-    padding: 2px 5px 0px 5px;
-}
-#mapLayerControls label {
-    padding-top: 4px;
-}
-#mapLayerControls .slider {
-    margin-bottom: 4px;
-}
-#mapLayerControls select {
-    color: #000;
-    background: #EEEEEE;
-    /*-moz-user-select: auto;*/
-}
-#mapLayerControls .layerControls {
-    margin-top: 0;
-}
-#outlineDots {
-    height: 20px;
-}
-#recordLayerControl {
-    padding: 0 5px;
-}
-
-</style>
 
 </html>
