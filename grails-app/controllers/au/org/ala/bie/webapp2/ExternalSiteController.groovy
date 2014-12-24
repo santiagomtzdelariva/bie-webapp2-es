@@ -1,4 +1,7 @@
 package au.org.ala.bie.webapp2
+
+import grails.converters.JSON
+import groovy.json.JsonSlurper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -10,6 +13,28 @@ class ExternalSiteController {
     def genbankBase = "http://www.ncbi.nlm.nih.gov"
     def scholarBase = "http://scholar.google.com"
 
+    def eol = {
+        def searchString = params.s
+        def nameEncoded = URLEncoder.encode(searchString, "UTF-8")
+        def searchURL = "http://eol.org/api/search/1.0.json?q=${nameEncoded}&page=1&exact=true&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl="
+
+        def js = new JsonSlurper()
+        def jsonText = new URL(searchURL).text
+
+        def json = js.parseText(jsonText)
+
+        //get first pageId
+        if(json.results){
+            def pageId = json.results[0].id
+            def pageUrl = "http://eol.org/api/pages/1.0/${pageId}.json?images=00&videos=0&sounds=0&maps=0&text=2&iucn=false&subjects=overview&licenses=all&details=true&references=true&vetted=0&cache_ttl="
+            def pageText = new URL(pageUrl).text
+            response.setContentType("application/json")
+            render pageText
+        } else {
+            render ([:] as JSON)
+        }
+    }
+
     def genbank = {
 
         def searchStrings = params.list("s")
@@ -20,8 +45,6 @@ class ExternalSiteController {
         Elements results = doc.select("div.rslt")
 
         def totalResultsRaw = doc.select("h2.result_count").text()
-        def matcher = totalResultsRaw =~ "All \\(([0-9]{1,})\\)"
-//        def found = matcher.find()
         def totalResults = 0
         def formattedResults = []
 

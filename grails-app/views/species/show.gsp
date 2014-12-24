@@ -49,6 +49,7 @@
             bieUrl:             "${grailsApplication.config.bie.baseURL}",
             alertsUrl:          "${grailsApplication.config.alerts.baseUrl}",
             remoteUser:         "${request.remoteUser?:''}",
+            eolUrl:             "${createLink(controller: 'externalSite', action:'eol',params:[s:tc?.taxonConcept?.nameString?:''])}",
             genbankUrl:         "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
             scholarUrl:         "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
             soundUrl:           "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}"
@@ -57,6 +58,28 @@
         google.load("visualization", "1", {packages:["corechart"]});
 
         $(function(){
+            $.ajax({url: SHOW_CONF.eolUrl}).done(function ( data ) {
+                console.log(data);
+                console.log('Loading EOL content - ' + data.dataObjects.length);
+                //clone a description template...
+                if(data.dataObjects){
+                    console.log('Loading EOL content - ' + data.dataObjects.length);
+                    $.each(data.dataObjects, function(idx, dataObject){
+                        var $description = $('#descriptionTemplate').clone()
+                        $description.attr('id', dataObject.id);
+                        $description.find(".title").html(dataObject.title);
+                        $description.find(".content").html(dataObject.description);
+                        $description.find(".sourceLink").attr('href',dataObject.source);
+                        $description.find(".sourceLink").html(dataObject.rightsHolder)
+                        $description.find(".rights").html(dataObject.rights)
+                        $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
+                        $description.find(".providedBy").html("Encyclopedia of Life")
+
+                        $description.appendTo('#descriptiveContent');
+                    });
+                }
+            });
+
             $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
                 $('#genbankResultCount').html('-  <a href="' + data.resultsUrl + '"> view all results - ' + data.total + '</a>');
                 if(data.results){
@@ -93,6 +116,13 @@
 
             showSpeciesPage();
         })
+
+        function loadExternalReferences(){
+
+
+
+
+        }
 
         function loadMap() {
 
@@ -230,6 +260,9 @@
                                         <br/>
                                         <img id="thirdOverviewImage" src=""/>
                                     </div>
+                                </div>
+
+                                <div id="descriptiveContent">
                                 </div>
 
                                 %{--<br/>--}%
@@ -683,6 +716,17 @@
             </div><!--tabs-panes-noborder-->
         </div><!--col-wide last-->
     </div><!--inner-->
+
+<div id="descriptionTemplate" class="well">
+    <h4 class="title"></h4>
+    <p class="content"></p>
+    <cite class="citation">
+        <a class="sourceLink" href=""></a><br/>
+        <span class="rights"></span><br/>
+        <a href="" class="providedBy"></a>
+    </cite>
+</div>
+
 
 </body>
 
