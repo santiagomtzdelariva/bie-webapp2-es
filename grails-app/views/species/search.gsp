@@ -32,7 +32,16 @@
             bhlUrl: "${grailsApplication.config.bhl.baseURL}"
         }
     </r:script>
+    <style type="text/css">
+
+    .result { background-color: #f5f5f5; border: 1px solid #e3e3e3;  }
+    .result h4 { margin-left: 10px;}
+    .result p { margin-left: 10px;}
+    .result img{ margin-bottom: 10px; margin-right: 10px; max-width:250px;}
+
+    </style>
 </head>
+
 <body class="species nav-species search content">
     <header id="page-header">
         <div class="inner row-fluid">
@@ -163,52 +172,50 @@
             </div><!--end .col-narrow-->
             <div class="span8">
                 <div class="solrResults">
-                    <div id="dropdownsXX">
-                        <g:if test="${idxTypes.contains("TAXON")}">
-                            <g:set var="downloadUrl" value="${grailsApplication.config.bie.baseURL}/ws/download/?${downloadParams}${appendQueryParam}&sort=${searchResults.sort}&dir=${searchResults.dir}"/>
-                            <input type="button" onclick="window.location='${downloadUrl}'" value="Download" title="Download a list of taxa for your search" class="btn btn-small" style="float:left;"/>
-                        </g:if>
-                        <div id="sortWidgetXX" class="row-fluid form-horizontal">
-                            <div class="span4 control-group">
-                                <label class="control-label" for="per-page">Results per page</label>
-                                <div class="controls">
-                                    <select id="per-page" name="per-page" class="input-mini">
-                                        <option value="10" ${(params.rows == '10') ? "selected=\"selected\"" : ""}>10</option>
-                                        <option value="20" ${(params.rows == '20') ? "selected=\"selected\"" : ""}>20</option>
-                                        <option value="50" ${(params.rows == '50') ? "selected=\"selected\"" : ""}>50</option>
-                                        <option value="100" ${(params.rows == '100') ? "selected=\"selected\"" : ""} >100</option>
-                                    </select>
-                                </div>
+                    <g:if test="${idxTypes.contains("TAXON")}">
+                        <g:set var="downloadUrl" value="${grailsApplication.config.bie.baseURL}/ws/download/?${downloadParams}${appendQueryParam}&sort=${searchResults.sort}&dir=${searchResults.dir}"/>
+                        <input type="button" onclick="window.location='${downloadUrl}'" value="Download" title="Download a list of taxa for your search" class="btn btn-small" style="float:left;"/>
+                    </g:if>
+                    <div class="row-fluid">
+                        <div class="span3">
+                            <label class="control-labelXX" for="per-page">Results per page</label>
+                            <div class="controls">
+                                <select id="per-page" name="per-page" class="input-mini">
+                                    <option value="10" ${(params.rows == '10') ? "selected=\"selected\"" : ""}>10</option>
+                                    <option value="20" ${(params.rows == '20') ? "selected=\"selected\"" : ""}>20</option>
+                                    <option value="50" ${(params.rows == '50') ? "selected=\"selected\"" : ""}>50</option>
+                                    <option value="100" ${(params.rows == '100') ? "selected=\"selected\"" : ""} >100</option>
+                                </select>
                             </div>
-                            <div class="span4 control-group">
-                                <label class="control-label" for="sortField">Sort by</label>
-                                <div class="controls">
-                                    <select id="sortField" name="sort" class="input-medium">
-                                        <option value="score" ${(params.sortField == 'score') ? "selected=\"selected\"" : ""}>best match</option>
-                                        <option value="scientificName" ${(params.sortField == 'scientificName') ? "selected=\"selected\"" : ""}>scientific name</option>
-                                        <option value="commonNameSingle" ${(params.sortField == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
-                                        <option value="rank" ${(params.sortField == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="span3">
+                            <label class="control-labelXX" for="sortField">Sort by</label>
+                            <div class="controls">
+                                <select id="sortField" name="sort" class="input-medium">
+                                    <option value="score" ${(params.sortField == 'score') ? "selected=\"selected\"" : ""}>best match</option>
+                                    <option value="scientificName" ${(params.sortField == 'scientificName') ? "selected=\"selected\"" : ""}>scientific name</option>
+                                    <option value="commonNameSingle" ${(params.sortField == 'commonNameSingle') ? "selected=\"selected\"" : ""}>common name</option>
+                                    <option value="rank" ${(params.sortField == 'rank') ? "selected=\"selected\"" : ""}>taxon rank</option>
+                                </select>
                             </div>
-                            <div class="span4 control-group">
-                                <label class="control-label" for="dir">Sort order</label>
-                                <div class="controls">
-                                    <select id="dir" name="dir" class="input-small">
-                                        <option value="asc" ${(params.dir == 'asc') ? "selected=\"selected\"" : ""}>normal</option>
-                                        <option value="desc" ${(params.dir == 'desc') ? "selected=\"selected\"" : ""}>reverse</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="span3">
+                            <label class="control-labelXX" for="dir">Sort order</label>
+                            <div class="controls">
+                                <select id="dir" name="dir" class="input-small">
+                                    <option value="asc" ${(params.dir == 'asc') ? "selected=\"selected\"" : ""}>normal</option>
+                                    <option value="desc" ${(params.dir == 'desc') ? "selected=\"selected\"" : ""}>reverse</option>
+                                </select>
                             </div>
-                            <input type="hidden" value="${pageTitle}" name="title"/>
-                        </div><!--sortWidget-->
-                    </div><!--drop downs-->
+                        </div>
+                    </div><!--sortWidget-->
+                    <input type="hidden" value="${pageTitle}" name="title"/>
                     <div class="resultsXX">
                         <g:each var="result" in="${searchResults.results}">
                             <g:set var="sectionText"><g:if test="${!facetMap.idxtype}"><span><b>Section:</b> <g:message code="idxType.${result.idxType}"/></span></g:if></g:set>
                                 <g:if test="${result.has("idxType") && result.idxType == 'TAXON'}">
-                                    <div class="well well-small row-fluid">
-                                        <div class="span8">
+                                    <div class="result row-fluid">
+                                        <div class="${result.smallImageUrl ? 'span8' : 'span12'}">
                                             <h4>
                                             <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
 
@@ -246,11 +253,11 @@
                                                 </g:if>
                                             </p>
                                         </div>
-                                        <div class="span4">
-                                            <g:if test="${result.smallImageUrl}">
-                                                <a href="${speciesPageLink}" class="occurrenceLink"><img src="${result.smallImageUrl}" style="max-height: 150px; max-width: 300px; margin-top:10px;" alt="species image thumbnail"/></a>
-                                            </g:if>
-                                        </div>
+                                        <g:if test="${result.smallImageUrl}">
+                                            <div class="span4">
+                                                <a href="${speciesPageLink}" class="occurrenceLink"><img src="${result.smallImageUrl}" style="max-height: 150px; max-width: 230px; margin-top:10px;" alt="species image thumbnail"/></a>
+                                            </div>
+                                        </g:if>
                                     </div>
 
                                     <p>
@@ -310,15 +317,8 @@
                                     <h4><g:message code="idxType.${result.idxType}"/>: <a href="${result.guid}">${result.name}</a></h4>
                                     <p><!-- ${sectionText} --></p>
                                 </g:else>
-                            %{--<div class="resultSeparator">&nbsp;</div>--}%
                         </g:each>
                     </div><!--close results-->
-                    <g:if test="${false && searchResults && searchResults.totalRecords > searchResults.pageSize}">
-                        <div id="searchNavBar">
-                            <bie:searchNavigationLinks totalRecords="${searchResults?.totalRecords}" startIndex="${searchResults?.startIndex}"
-                                      lastPage="${lastPage?:-1}" pageSize="${searchResults?.pageSize}"/>
-                        </div>
-                    </g:if>
                     <div id="searchNavBar" class="pagination">
                         <g:paginate total="${searchResults?.totalRecords}" action="search"  params="${[q: params.q, fq: params.fq, dir: params.dir ]}"/>
                     </div>
