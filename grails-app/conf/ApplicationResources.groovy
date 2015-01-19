@@ -23,7 +23,7 @@ modules = {
     }
 
     show {
-        dependsOn 'colorbox, fancybox, cleanHtml, snazzy, bootstrap'
+        dependsOn 'colorbox, fancybox, cleanHtml, snazzy'
         resource url: "http://leafletjs.com/dist/leaflet.js" , attrs:[type:'js'], disposition: 'head'
         resource url: "http://leafletjs.com/dist/leaflet.css" , attrs:[type:'css'], disposition: 'head'
         resource url:[dir:'css', file:'species.css']

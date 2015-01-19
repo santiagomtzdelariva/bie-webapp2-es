@@ -76,14 +76,14 @@
             //send a query to server side to present new content
             $.ajax({
                 type: "GET",
-                url: "${grailsApplication.config.bie.baseURL}/image-search/showSpecies.json?taxonRank=${params['taxonRank']}&scientificName=${params['scientificName']}&start=" + (currentPage * pageSize) + "&pageSize=" + pageSize,
+                url: "http://localhost:8080/taxon-index/solr/imageSearch?taxonRank=${params['taxonRank']}&scientificName=${params['scientificName']}&start=" + (currentPage * pageSize) + "&rows=" + pageSize,
                 contentType: "application/json; charset=utf-8",
-                dataType: "jsonp",
+                dataType: "json",
                 success: function (data) {
                     if (data) {
                         //addTable(data);
-                        $("#totalImageCount").text(numberWithCommas(data.totalRecords));
-                        addImages(data);
+                        $("#totalImageCount").text(data.searchResults.totalRecords);
+                        addImages(data.searchResults);
                         currentPage = currentPage + 1;
                         $('#divPostsLoader').empty();
                     }
@@ -99,29 +99,28 @@
             if (data.results.length > 0) {
                 $.each(data.results, function(i, el) {
                     //console.log('el', i, el);
-                    var scientificName = (el.nameComplete) ? "<i>" + el.nameComplete + "</i>" : "";
-                    var commonName = (el.commonNameSingle) ? el.commonNameSingle + "<br/> " : "";
-                    var imageUrl = el.thumbnail;
-                    var titleText = $("<div/>" + commonName.replace("<br/>"," - ") + scientificName).text();
-                    if (imageUrl) {
-                        imageUrl = imageUrl.replace('thumbnail', 'smallRaw');
+                    if(el.smallImageUrl) {
+                        var scientificName = (el.nameComplete) ? "<i>" + el.nameComplete + "</i>" : "";
+                        var commonName = (el.commonNameSingle) ? el.commonNameSingle + "<br/> " : "";
+                        var imageUrl = el.smallImageUrl;
+                        var titleText = $("<div/>" + commonName.replace("<br/>", " - ") + scientificName).text();
+                        var $ImgCon = $('.imgConTmpl').clone();
+                        $ImgCon.removeClass('imgConTmpl').removeClass('hide');
+                        var link = $ImgCon.find('a.thumbImage');
+                        link.attr('href', '${grailsApplication.config.grails.serverURL}/species/' + el.guid);
+                        link.attr('title', titleText);
+                        $ImgCon.find('img').attr('src', imageUrl);
+                        $ImgCon.find('.brief').html(commonName + scientificName);
+
+                        var detail = scientificName + " " + el.author;
+                        if (el.commonNameSingle) detail += "<br>" + el.commonNameSingle;
+                        if (el.family)  detail += "<br>Family: " + el.family;
+                        if (el.order)  detail += "<br>Order: " + el.order;
+                        if (el.class)  detail += "<br>Class: " + el.class;
+                        $ImgCon.find('.detail').html(detail);
+
+                        $("#imageResults").append($ImgCon.html());
                     }
-                    var $ImgCon = $('.imgConTmpl').clone();
-                    $ImgCon.removeClass('imgConTmpl').removeClass('hide');
-                    var link = $ImgCon.find('a.thumbImage');
-                    link.attr('href', '${grailsApplication.config.grails.serverURL}/species/' + el.guid);
-                    link.attr('title', titleText);
-                    $ImgCon.find('img').attr('src', imageUrl);
-                    $ImgCon.find('.brief').html(commonName + scientificName);
-
-                    var detail = scientificName + " " + el.author;
-                    if (el.commonNameSingle) detail += "<br>" + el.commonNameSingle;
-                    if (el.family)  detail += "<br>Family: " + el.family;
-                    if (el.order)  detail += "<br>Order: " + el.order;
-                    if (el.class)  detail += "<br>Class: " + el.class;
-                    $ImgCon.find('.detail').html(detail);
-
-                    $("#imageResults").append($ImgCon.html());
                 });
                 // add delay for trigger div
                 $("#loadMoreTrigger").delay(500).show();
@@ -265,7 +264,7 @@
 
         <div id="divPostsLoader" style="margin-left:auto;margin-right:auto; width:120px;"></div>
 
-        <div id="loadMoreTrigger" style="display: block;"><input type="button" id="loadMoreButton"  value="Load more images"/></div>
+        <div id="loadMoreTrigger" style="display: block;"><input type="button" id="loadMoreButton" class="btn" value="Load more images"/></div>
     </div>
 </body>
 </html>

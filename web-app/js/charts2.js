@@ -18,9 +18,9 @@
  *------------------------------------------------------------------------------------------*/
 // define a base object with the major defaults that we can inherit from (prototypically)
 var baseFacetChart = {
-    collectionsUrl: "http://collections.ala.org.au",
-    biocacheServicesUrl: "http://biocache.ala.org.au/ws",
-    biocacheWebappUrl: "http://biocache.ala.org.au",
+    collectionsUrl: "http://no-default-collectory",
+    biocacheServicesUrl: "http://no-default-biocache/ws",
+    biocacheWebappUrl: "http://no-default-biocache",
     chartsDiv: null,  // the container for the chart
     chart: null,    // the google chart object
     width: 480,
@@ -686,7 +686,8 @@ var taxonomyPieChartOptions = {
     is3D: true,
     titleTextStyle: {color: "#555", fontName: 'Arial', fontSize: 15},
     sliceVisibilityThreshold: 0,
-    legend: "right"
+    legend: "right",
+    backgroundColor: {fill :'transparent'}
 };
 
 // defaults for facet charts
@@ -698,7 +699,8 @@ var genericChartOptions = {
     titleTextStyle: {color: "#555", fontName: 'Arial', fontSize: 15},
     sliceVisibilityThreshold: 0,
     legend: "right",
-    chartType: "pie"
+    chartType: "pie",
+    backgroundColor: {fill :'transparent'}
 };
 
 // defaults for individual facet charts

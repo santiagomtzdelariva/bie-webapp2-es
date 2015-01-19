@@ -55,12 +55,12 @@
         <hgroup class="row-fluid">
             <div class="span9">
                 <g:if test="${searchResults.totalRecords}">
-                    <h2>Search for "<b>${query.replaceFirst(/^\*$/, "[all records]")}</b>" returned <g:formatNumber number="${searchResults.totalRecords}" type="number"/> results</h2>
+                    <h2>Search for "<b>${query.replaceFirst(/^\*$/, "all records")}</b>" returned <g:formatNumber number="${searchResults.totalRecords}" type="number"/> results</h2>
                 </g:if>
                 <g:else>
                     <h2>Search for <b>${query}</b> did not match any documents</h2>
                 </g:else>
-                <div class="hidden-desktopXXXX">
+                <div class="inner-search-form">
                     <form class="form-search" action="${grailsApplication.config.grails.serverURL}/search">
                         <div class="input-append">
                             <input type="text" class="search-query input-xxlarge" name="q" id="search-2013"  placeholder="Search the Atlas" autocomplete="off" value="${params.q}"/>
@@ -123,8 +123,8 @@
                                     </ul>
                                 </div>
                             </g:if>
-                            <g:each var="facetResult" in="${searchResults.facetResults?:[]}">
-                                <g:if test="${!facetMap?.get(facetResult.fieldName) && !filterQuery?.contains(facetResult.fieldResult?.opt(0)?.label) && !facetResult.fieldName?.contains('idxtype1')}">
+                            <g:each var="facetResult" in="${searchResults.facetResults}">
+                                <g:if test="${!facetMap?.get(facetResult.fieldName) && !filterQuery?.contains(facetResult.fieldResult?.opt(0)?.label) && !facetResult.fieldName?.contains('idxtype1') && facetResult.fieldResult.length() > 0 }">
                                     <h3><span class="FieldName"><g:message code="facet.${facetResult.fieldName}"/></span></h3>
                                     <div class="subnavlist" id="facet-${facetResult.fieldName}">
                                         <ul>
@@ -242,6 +242,8 @@
                                                 <g:if test="${result.kingdom}">
                                                     <span><strong class="resultsLabel">Kingdom</strong>: ${result.kingdom}</span>
                                                 </g:if>
+                                            </p>
+                                            <p>
                                                 <g:if test="${result.rankId && result.rankId > 5000}">
                                                     <span class="recordSighting" style="display:inline;">
                                                         <a href="${grailsApplication.config.brds.guidUrl}${result.guid}">Record a sighting/share a photo</a>

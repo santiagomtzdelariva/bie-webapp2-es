@@ -190,7 +190,6 @@ function showSpeciesPage() {
 
     //Trove search results
     setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
-
 }
 
 function chartsError() {

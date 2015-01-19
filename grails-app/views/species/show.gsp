@@ -58,17 +58,19 @@
                 if(data.dataObjects){
                     console.log('Loading EOL content - ' + data.dataObjects.length);
                     $.each(data.dataObjects, function(idx, dataObject){
-                        var $description = $('#descriptionTemplate').clone()
-                        $description.attr('id', dataObject.id);
-                        $description.find(".title").html(dataObject.title);
-                        $description.find(".content").html(dataObject.description);
-                        $description.find(".sourceLink").attr('href',dataObject.source);
-                        $description.find(".sourceLink").html(dataObject.rightsHolder)
-                        $description.find(".rights").html(dataObject.rights)
-                        $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
-                        $description.find(".providedBy").html("Encyclopedia of Life")
-
-                        $description.appendTo('#descriptiveContent');
+                        if(dataObject.language == "${grailsApplication.config.eol.lang}"){
+                            var $description = $('#descriptionTemplate').clone()
+                            $description.css({'display':'block'});
+                            $description.attr('id', dataObject.id);
+                            $description.find(".title").html(dataObject.title);
+                            $description.find(".content").html(dataObject.description);
+                            $description.find(".sourceLink").attr('href',dataObject.source);
+                            $description.find(".sourceLink").html(dataObject.rightsHolder)
+                            $description.find(".rights").html(dataObject.rights)
+                            $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
+                            $description.find(".providedBy").html("Encyclopedia of Life")
+                            $description.appendTo('#descriptiveContent');
+                        }
                     });
                 }
             });
@@ -349,7 +351,6 @@
                                 </g:if>
                             </g:each>
                         </dl>
-
                     </g:if>
                     </table>
                 </section><!--#overview-->
@@ -645,7 +646,7 @@
         </div><!--col-wide last-->
     </div><!--inner-->
 
-    <div id="descriptionTemplate" class="well">
+    <div id="descriptionTemplate" class="well" style="display:none;">
         <h4 class="title"></h4>
         <p class="content"></p>
         <cite class="citation">

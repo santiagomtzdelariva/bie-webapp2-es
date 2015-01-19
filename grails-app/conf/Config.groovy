@@ -105,9 +105,9 @@ if(!auth.admin_role){
 if(!skin.layout){
     skin.layout = "generic"
 }
-
-
-nonTruncatedSources = ["http://www.environment.gov.au/biodiversity/abrs/online-resources/flora/main/index.html"]
+if(!eol.lang) {
+    eol.lang = "en"
+}
 
 springcache {
     defaults {
@@ -148,6 +148,8 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
 
+//grails.resources.rewrite.css = false
+
 grails.project.war.file = "bie-webapp2.war"
 // The default codec used to encode data with ${}
 grails.views.default.codec = "none" // none, html, base64
@@ -173,18 +175,15 @@ grails.exceptionresolver.params.exclude = ['password']
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
+grails.resources.adhoc.includes = [
+        '/bootstrap/img/**', '/images/**', '/css/**', '/js/**', '/img/**', '/fonts/**'
+]
+
 // set per-environment serverURL stem for creating absolute links
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.host = "http://dev.ala.org.au"
-        grails.serverURL = "${grails.host}:8080/${appName}"
-        //bie.baseURL = grails.serverURL
-        security.cas.appServerName = "${grails.host}:8090"
-        security.cas.contextPath = "/${appName}"
-        // cached-resources plugin - keeps original filenames but adds cache-busting params
-        grails.resources.debug = true
-      //  bie.baseURL = "http://diasbtest1-cbr.vm.csiro.au:8080/bie-service"
+        grails.resources.debug = false
     }
     test {
         grails.logging.jul.usebridge = false
