@@ -32,18 +32,9 @@
             bhlUrl: "${grailsApplication.config.bhl.baseURL}"
         }
     </r:script>
-    <style type="text/css">
-
-    .result { background-color: #f5f5f5; border: 1px solid #e3e3e3;  }
-    .result h4 { margin-left: 10px;}
-    .result p { margin-left: 10px;}
-    .result img{ margin-bottom: 10px; margin-right: 10px; max-width:250px;}
-
-    </style>
 </head>
-
-<body class="species nav-species search content">
-    <header id="page-header">
+<body class="species nav-species search content no-heading-bar">
+    <header id="page-header" class="page-heading">
         <div class="inner row-fluid">
             <div id="breadcrumb" class="span12">
                 <ol class="breadcrumb">
@@ -69,7 +60,6 @@
                     </form>
                 </div>
             </div>
-
             <div class="span3 well well-small hidden-phone" id="relatedSearches">
                 <!-- content inserted via jQuery -->
             </div>
@@ -231,7 +221,6 @@
                                             </g:if>
                                             <g:if test="${result.commonNameSingle}"><span class="commonNameSummary">&nbsp;&ndash;&nbsp; ${result.commonNameSingle}</span></g:if>
                                             </h4>
-
                                             <p>
                                                 <g:if test="${result.commonNameSingle && result.commonNameSingle != result.commonName}">
                                                     <span>${result.commonName}</span>

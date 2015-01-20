@@ -231,7 +231,7 @@
     </style>
 </head>
 <body class="nav-species fluid">
-    <header id="page-header">
+    <header id="page-header" class="heading-bar">
         <div class="inner row-fluid">
             <nav id="breadcrumb" class="span12">
                 <ol class="breadcrumb">
@@ -240,11 +240,13 @@
                     <li class="active">Image browser for ${msg}</li>
                 </ol>
             </nav>
-            <hgroup>
-                <h1>Images of <b id="totalImageCount">...</b> species from ${params.taxonRank}:
-                    <a href="${grailsApplication.config.grails.serverURL}/species/${params.scientificName}" title="More information on this ${params.taxonRank}">${params.scientificName}</a></h1>
-            </hgroup>
         </div>
+        <h1>Images of <b id="totalImageCount">...</b> species
+
+            <g:if test="${params.taxonRank && params.scientificName}">
+                from ${params.taxonRank}:
+                <a href="${grailsApplication.config.grails.serverURL}/search?q=${params.scientificName}" title="More information on this ${params.taxonRank}">${params.scientificName}</a></h1>
+            </g:if>
     </header>
     <div class="inner">
         <%-- template used by AJAX code --%>

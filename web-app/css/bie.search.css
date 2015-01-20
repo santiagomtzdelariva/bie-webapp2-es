@@ -132,3 +132,8 @@ div#sortWidget {
 .buttonDiv a {
     text-decoration: none
 }
+
+.result { background-color: #f5f5f5; border: 1px solid #e3e3e3;  }
+.result h4 { margin-left: 10px;}
+.result p { margin-left: 10px;}
+.result img{ margin-bottom: 10px; margin-right: 10px; max-width:250px;}

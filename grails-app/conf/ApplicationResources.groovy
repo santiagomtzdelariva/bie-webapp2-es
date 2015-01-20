@@ -58,4 +58,7 @@ modules = {
         resource url:[dir:'css', file:'jquery.fancybox.css']
         resource url:[dir:'js', file:'jquery.fancybox.pack.js'], disposition: 'head'
     }
+    uk {
+        resource url: 'http://www.cerulean.co.nz/atlas/css/uk-wildlife.css'
+    }
 }

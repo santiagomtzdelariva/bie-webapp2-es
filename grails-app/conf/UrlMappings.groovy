@@ -16,7 +16,6 @@ class UrlMappings {
         "/species/${guid}.json"(controller: "legacyWebServices", action: "speciesJson")
         "/species/${guid}.xml"(controller: "legacyWebServices", action: "speciesXml")
         "/species/$path1/${guid}.json"(controller: "legacyWebServices", action: "speciesJson")
-        "/image-search/${type}.json"(controller: "legacyWebServices", action: "imageSearchJson")
         "/rankTaxonImage.json"(controller: "legacyWebServices", action: "imageRankJson"){ withUser = false }
         "/rankTaxonImageWithUser.json"(controller: "legacyWebServices", action: "imageRankJson"){ withUser = true }
         "/rankTaxonCommonName.json"(controller: "legacyWebServices", action: "nameRankJson"){ withUser = false }
@@ -26,6 +25,8 @@ class UrlMappings {
         // webapp URLs
         "/species/$guid"(controller: "species", action: "show")
         "/search"(controller: "species", action: "search")
+        "/image-search"(controller: "species", action: "imageSearch")
+        "/image-search/"(controller: "species", action: "imageSearch")
         "/image-search/showSpecies"(controller: "species", action: "imageSearch")
         "/image-search/infoBox"(controller: "species", action: "infoBox")
         "/bhl-search"(controller: "species", action: "bhlSearch")

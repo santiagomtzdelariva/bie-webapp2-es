@@ -179,15 +179,10 @@
         }
     </r:script>
     <r:require module="show"/>
-    <style type="text/css">
-        div.audiojs { margin: 15px 0px 5px; }
-        div.audiojs div.scrubber { width:120px;}
-        div.audiojs div.time { display:none; width:50px; }
-    </style>
 </head>
 <body class="speciesXX nav-speciesXX contentXX">
 
-        <header id="page-header">
+        <header id="page-header" class="heading-bar">
             <div class="inner row-fluid">
                 <div id="breadcrumb" class="span12">
                     <ol class="breadcrumb">

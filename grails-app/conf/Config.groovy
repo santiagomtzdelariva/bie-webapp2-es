@@ -22,7 +22,12 @@ grails.project.groupId = 'au.org.ala'
  *  EXTERNAL SERVERS
  \******************************************************************************/
 runWithNoExternalConfig = true
-
+if(!projectNameShort){
+    projectNameShort = "Atlas"
+}
+if(!projectName){
+    projectName = "Atlas of Living Australia"
+}
 if(!bie.baseURL){
     bie.baseURL = "http://bie.ala.org.au"
 }
@@ -107,6 +112,9 @@ if(!skin.layout){
 }
 if(!eol.lang) {
     eol.lang = "en"
+}
+if(!taxon.index.url){
+    taxon.index.url = "http://localhost:8080/taxon-index"
 }
 
 springcache {

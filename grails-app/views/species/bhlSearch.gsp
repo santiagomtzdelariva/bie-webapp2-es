@@ -12,8 +12,6 @@
   - implied. See the License for the specific language governing
   - rights and limitations under the License.
   --}%
-
-
 <%--
   Created by IntelliJ IDEA.
   User: nick
@@ -26,7 +24,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${params.q} | BHL Search | Atlas of Living Australia</title>
+    <title>${params.q} | BHL search | ${grailsApplication.config.skin.orgNameLong}</title>
     <meta name="layout" content="${grailsApplication.config.skin.layout}"/>
     <r:require modules="colorbox, cleanHtml, snazzy"/>
     <r:script disposition='head'>
@@ -165,7 +163,7 @@
     </r:script>
 </head>
 <body class="nav-species">
-    <header id="page-header">
+    <header id="page-header" class="heading-bar">
         <div class="inner row-fluid">
             <nav id="breadcrumb" class="span12">
                 <ol class="breadcrumb">
@@ -173,23 +171,10 @@
                     <li class="active">BHL Search</li>
                 </ol>
             </nav>
-            <hgroup>
-                <h1>Biodiversity Heritage Library</h1>
-            </hgroup>
         </div>
+        <h1>Biodiversity Heritage Library</h1>
     </header>
     <div class="inner">
-        <!--
-        <form action="" class="search-form-2011">
-            <input type="search" name="q" value="${params.q?:''}" class="filled ac_input"/>
-            <span class="search-button-wrapper">
-                <button id="search-button" class="search-button" value="Search" type="submit">
-                    <img src="http://www.ala.org.au/wp-content/themes/ala2011/images/button_search-grey.png" alt="Search" width="12" height="12" />
-                </button>
-            </span>
-        </form>
-        -->
-
         <section id="content-search">
             <form id="search-form" action="" method="get" name="search-form">
             %{--<label for="search">Search</label>--}%
@@ -197,12 +182,6 @@
                 <input id="search" class="span4" name="q" type="text" placeholder="Search BHL" autocomplete="off" value="${params.q?:''}">
                 <input type="submit" class="btn" alt="Search" value="Search">
             </div>
-            %{--<input id="search" title="Search" type="text" name="q" placeholder="${params.q?:''}" />--}%
-            %{--<span class="search-button-wrapper">--}%
-                %{--<button id="search-button" class="search-button" value="Search" type="submit">--}%
-                    %{--<img src="http://www.ala.org.au/wp-content/themes/ala2011/images/button_search.png" alt="Search" width="27" height="27" />--}%
-                %{--</button>--}%
-            %{--</span>--}%
             </form>
         </section>
 

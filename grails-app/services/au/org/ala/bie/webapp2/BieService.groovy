@@ -8,8 +8,7 @@ class BieService {
     def grailsApplication
 
     def searchBie(SearchRequestParamsDTO requestObj) {
-//    def searchBie(String queryString) {
-        def json = webService.get("http://localhost:8080/taxon-index/solr/search?" + requestObj.getQueryString())
+        def json = webService.get(grailsApplication.config.taxon.index.url + "/solr/search?" + requestObj.getQueryString())
         return JSON.parse(json)
     }
 
@@ -31,7 +30,7 @@ class BieService {
         if (!guid) {
             return null
         }
-        def json = webService.get("http://localhost:8080/taxon-index/solr/taxon/" + guid.replaceAll(/\s+/,'+'))
+        def json = webService.get(grailsApplication.config.taxon.index.url + "/solr/taxon/" + guid.replaceAll(/\s+/,'+'))
         //log.debug "ETC json: " + json
         try{
             JSON.parse(json)
@@ -60,7 +59,7 @@ class BieService {
 
     def getClassificationForGuid(guid) {
 //        String url = grailsApplication.config.bie?.baseURL + "/ws/classification/" + guid.replaceAll(/\s+/,'+')
-        String url = "http://localhost:8080/taxon-index/solr/classification/" + guid.replaceAll(/\s+/,'+')
+        String url = grailsApplication.config.taxon.index.url + "/solr/classification/" + guid.replaceAll(/\s+/,'+')
         def json = webService.getJson(url)
         log.debug "json type = " + json
         if (json instanceof JSONObject && json.has("error")) {
@@ -74,7 +73,7 @@ class BieService {
 
     def getChildConceptsForGuid(guid) {
         //String url = grailsApplication.config.bie?.baseURL + "/ws/childConcepts/" + guid.replaceAll(/\s+/,'+')
-        String url = "http://localhost:8080/taxon-index/solr/childConcepts/" + guid.replaceAll(/\s+/,'+')
+        String url = grailsApplication.config.taxon.index.url + "/solr/childConcepts/" + guid.replaceAll(/\s+/,'+')
         def json = webService.getJson(url).sort() { it.rankId?:0 }
 
         if (json instanceof JSONObject && json.has("error")) {
@@ -88,7 +87,7 @@ class BieService {
 
     /**
      * Lookup against biocache for isAustralian property
-     *
+     * FIXME - rename to isNative...
      * @param guid
      * @return
      */
@@ -99,9 +98,7 @@ class BieService {
         if (ausTaxon instanceof JSONObject && ausTaxon.containsKey("isAustralian")) {
             isAustralian = ausTaxon.get("isAustralian")
         }
-
         log.debug("isAustralian lookup: " + isAustralian)
-
         return isAustralian
     }
 }
