@@ -162,7 +162,7 @@
 
     </r:script>
 </head>
-<body class="nav-species">
+<body class="nav-species bhl-search">
     <header id="page-header" class="heading-bar">
         <div class="inner row-fluid">
             <nav id="breadcrumb" class="span12">

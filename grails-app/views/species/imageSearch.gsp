@@ -230,7 +230,7 @@
 
     </style>
 </head>
-<body class="nav-species fluid">
+<body class="nav-species fluid image-search">
     <header id="page-header" class="heading-bar">
         <div class="inner row-fluid">
             <nav id="breadcrumb" class="span12">

@@ -33,7 +33,7 @@
         }
     </r:script>
 </head>
-<body class="species nav-species search content no-heading-bar">
+<body class="general-search species nav-species search content no-heading-bar">
     <header id="page-header" class="page-heading">
         <div class="inner row-fluid">
             <div id="breadcrumb" class="span12">

@@ -180,7 +180,7 @@
     </r:script>
     <r:require module="show"/>
 </head>
-<body class="speciesXX nav-speciesXX contentXX">
+<body class="species-page">
 
         <header id="page-header" class="heading-bar">
             <div class="inner row-fluid">
