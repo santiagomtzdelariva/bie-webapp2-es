@@ -242,6 +242,9 @@
                                                             <g:formatNumber number="${result.occCount}" type="number"/></a></span>
                                                     </g:if>
                                                 </g:if>
+                                                <g:elseif test="${result.rankId && result.rankId < 7000}">
+                                                    &nbsp;<span style="display:inline;"><a href="${createLink(controller:'species', action: 'imageSearch', params:[taxonRank:result.rank, scientificName:(result.nameComplete?:result.name).trim()])}">View images of species</a></span>
+                                                </g:elseif>
                                             </p>
                                         </div>
                                         <g:if test="${result.smallImageUrl}">

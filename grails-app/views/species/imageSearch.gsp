@@ -76,7 +76,7 @@
             //send a query to server side to present new content
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8080/taxon-index/solr/imageSearch?taxonRank=${params['taxonRank']}&scientificName=${params['scientificName']}&start=" + (currentPage * pageSize) + "&rows=" + pageSize,
+                url: "${grailsApplication.config.bie.index.url}/imageSearch?taxonRank=${params['taxonRank']}&scientificName=${params['scientificName']}&start=" + (currentPage * pageSize) + "&rows=" + pageSize,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {

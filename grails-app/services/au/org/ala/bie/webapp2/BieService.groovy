@@ -8,7 +8,7 @@ class BieService {
     def grailsApplication
 
     def searchBie(SearchRequestParamsDTO requestObj) {
-        def json = webService.get(grailsApplication.config.taxon.index.url + "/solr/search?" + requestObj.getQueryString())
+        def json = webService.get(grailsApplication.config.bie.index.url + "/search?" + requestObj.getQueryString())
         return JSON.parse(json)
     }
 
@@ -30,7 +30,7 @@ class BieService {
         if (!guid) {
             return null
         }
-        def json = webService.get(grailsApplication.config.taxon.index.url + "/solr/taxon/" + guid.replaceAll(/\s+/,'+'))
+        def json = webService.get(grailsApplication.config.bie.index.url + "/taxon/" + guid.replaceAll(/\s+/,'+'))
         //log.debug "ETC json: " + json
         try{
             JSON.parse(json)
@@ -59,7 +59,7 @@ class BieService {
 
     def getClassificationForGuid(guid) {
 //        String url = grailsApplication.config.bie?.baseURL + "/ws/classification/" + guid.replaceAll(/\s+/,'+')
-        String url = grailsApplication.config.taxon.index.url + "/solr/classification/" + guid.replaceAll(/\s+/,'+')
+        String url = grailsApplication.config.bie.index.url + "/classification/" + guid.replaceAll(/\s+/,'+')
         def json = webService.getJson(url)
         log.debug "json type = " + json
         if (json instanceof JSONObject && json.has("error")) {
@@ -73,8 +73,8 @@ class BieService {
 
     def getChildConceptsForGuid(guid) {
         //String url = grailsApplication.config.bie?.baseURL + "/ws/childConcepts/" + guid.replaceAll(/\s+/,'+')
-        String url = grailsApplication.config.taxon.index.url + "/solr/childConcepts/" + guid.replaceAll(/\s+/,'+')
-        def json = webService.getJson(url).sort() { it.rankId?:0 }
+        String url = grailsApplication.config.bie.index.url + "/childConcepts/" + guid.replaceAll(/\s+/,'+')
+        def json = webService.getJson(url).sort() { it.rankID?:0 }
 
         if (json instanceof JSONObject && json.has("error")) {
             log.warn "child concepts request error: " + json.error

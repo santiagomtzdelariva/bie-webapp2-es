@@ -524,13 +524,15 @@
                     </g:if>
                 </section><!--#names-->
                 <section class="tab-pane" id="classification">
-                    <h2>Working classification</h2>
+                    <h2>
+                        <g:if test="${grailsApplication.config.classificationSupplier}">${grailsApplication.config.classificationSupplier}</g:if>
+                        Classification
+                    </h2>
                     <div id="isAustralianSwitch"></div>
                         <g:each in="${taxonHierarchy}" var="taxon">
                             <!-- taxon = ${taxon} -->
-                            <%-- Note: check for rankId is here due to some taxonHierarchy including taxa at higher rank than requested taxon (bug)--%>
-                            <g:if test="${taxon.rankId?:0 <= tc.taxonConcept.rankID && taxon.guid != tc.taxonConcept.guid}">
-                                <dl><dt>${taxon.rank}</dt>
+                            <g:if test="${taxon.guid != tc.taxonConcept.guid}">
+                                <dl><dt><g:if test="${taxon.rankId?:0 !=0}">${taxon.rank}</g:if></dt>
                                     <dd><a href="${request?.contextPath}/species/${taxon.guid}#classification" title="${taxon.rank}">
                                         <bie:formatSciName name="${taxon.scientificName}" rankId="${taxon.rankId?:0}"/>
                                         <g:if test="${taxon.commonNameSingle}">: ${taxon.commonNameSingle}</g:if></a>

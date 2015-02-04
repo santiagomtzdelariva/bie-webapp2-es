@@ -113,8 +113,8 @@ if(!skin.layout){
 if(!eol.lang) {
     eol.lang = "en"
 }
-if(!taxon.index.url){
-    taxon.index.url = "http://localhost:8080/taxon-index"
+if(!bie.index.url){
+    bie.index.url = "http://localhost:8080/bie-index"
 }
 
 springcache {
