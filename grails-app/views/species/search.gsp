@@ -205,23 +205,31 @@
                             <g:set var="sectionText"><g:if test="${!facetMap.idxtype}"><span><b>Section:</b> <g:message code="idxType.${result.idxType}"/></span></g:if></g:set>
                                 <g:if test="${result.has("idxType") && result.idxType == 'TAXON'}">
                                     <div class="result row-fluid">
-                                        <div class="${result.smallImageUrl ? 'span8' : 'span12'}">
-                                            <h4>
-                                            <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
+                                        <div class="result">
 
-                                            <g:if test="${result.rank}"><span style="text-transform: capitalize; display: inline;">${result.rank}</span>:</g:if>
-                                            <g:if test="${result.linkIdentifier}">
-                                                <a href="${request.contextPath}/species/${result.linkIdentifier}" class="occurrenceLink"><bie:formatSciName rankId="${result.rankId}" name="${(result.nameComplete) ? result.nameComplete : result.name}" acceptedName="${result.acceptedConceptName}"/> </a>
+                                            <g:if test="${result.smallImageUrl}">
+                                                <div class="result-thumbnail">
+                                                    <a href="${speciesPageLink}" class="occurrenceLink"><img src="${result.smallImageUrl}" style="max-height: 150px; max-width: 230px; margin-top:10px;" alt="species image thumbnail"/></a>
+                                                </div>
                                             </g:if>
-                                            <g:if test="${!result.linkIdentifier}">
-                                                <a href="${request.contextPath}/species/${result.guid}" class="occurrenceLink"><bie:formatSciName rankId="${result.rankId}" name="${(result.nameComplete) ? result.nameComplete : result.name}" acceptedName="${result.acceptedConceptName}"/> </a>
-                                            </g:if>
-                                            <g:if test="${result.acceptedConceptName}">
-                                                (accepted name: ${result.acceptedConceptName})
-                                            </g:if>
-                                            <g:if test="${result.commonNameSingle}"><span class="commonNameSummary">&nbsp;&ndash;&nbsp; ${result.commonNameSingle}</span></g:if>
+
+                                            <h4>
+                                                <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
+
+                                                <g:if test="${result.rank}"><span style="text-transform: capitalize; display: inline;">${result.rank}</span>:</g:if>
+                                                <g:if test="${result.linkIdentifier}">
+                                                    <a href="${request.contextPath}/species/${result.linkIdentifier}" class="occurrenceLink"><bie:formatSciName rankId="${result.rankId}" name="${(result.nameComplete) ? result.nameComplete : result.name}" acceptedName="${result.acceptedConceptName}"/> </a>
+                                                </g:if>
+                                                <g:if test="${!result.linkIdentifier}">
+                                                    <a href="${request.contextPath}/species/${result.guid}" class="occurrenceLink"><bie:formatSciName rankId="${result.rankId}" name="${(result.nameComplete) ? result.nameComplete : result.name}" acceptedName="${result.acceptedConceptName}"/> </a>
+                                                </g:if>
+                                                <g:if test="${result.acceptedConceptName}">
+                                                    (accepted name: ${result.acceptedConceptName})
+                                                </g:if>
+                                                <g:if test="${result.commonNameSingle}"><span class="commonNameSummary">&nbsp;&ndash;&nbsp; ${result.commonNameSingle}</span></g:if>
                                             </h4>
-                                            <p>
+
+                                            <p class="result-taxonomy">
                                                 <g:if test="${result.commonNameSingle && result.commonNameSingle != result.commonName}">
                                                     <span>${result.commonName}</span>
                                                 </g:if>
@@ -232,8 +240,9 @@
                                                     <span><strong class="resultsLabel">Kingdom</strong>: ${result.kingdom}</span>
                                                 </g:if>
                                             </p>
-                                            <p>
-                                                <g:if test="${result.rankId && result.rankId > 5000}">
+
+                                            <g:if test="${result.rankId && result.rankId > 5000}">
+                                                <p class="result-record-sighting">
                                                     <span class="recordSighting" style="display:inline;">
                                                         <a href="${grailsApplication.config.brds.guidUrl}${result.guid}">Record a sighting/share a photo</a>
                                                     </span>&nbsp;
@@ -241,22 +250,15 @@
                                                         <span class="recordSighting" style="display:inline;"><a href="${biocacheUrl}/occurrences/taxa/${result.guid}">Occurrences:
                                                             <g:formatNumber number="${result.occCount}" type="number"/></a></span>
                                                     </g:if>
-                                                </g:if>
-                                                <g:elseif test="${result.rankId && result.rankId < 7000}">
-                                                    &nbsp;<span style="display:inline;"><a href="${createLink(controller:'species', action: 'imageSearch', params:[taxonRank:result.rank, scientificName:(result.nameComplete?:result.name).trim()])}">View images of species</a></span>
-                                                </g:elseif>
-                                            </p>
+                                                </p>
+                                            </g:if>
+                                            <g:elseif test="${result.rankId && result.rankId < 7000}">
+                                                <p class="result-image-search">
+                                                    <span><a href="${createLink(controller:'species', action: 'imageSearch', params:[taxonRank:result.rank, scientificName:result.scientificName.trim()])}">View images of species</a></span>
+                                                </p>
+                                            </g:elseif>
                                         </div>
-                                        <g:if test="${result.smallImageUrl}">
-                                            <div class="span4">
-                                                <a href="${speciesPageLink}" class="occurrenceLink"><img src="${result.smallImageUrl}" style="max-height: 150px; max-width: 230px; margin-top:10px;" alt="species image thumbnail"/></a>
-                                            </div>
-                                        </g:if>
                                     </div>
-
-                                    <p>
-                                    <!-- ${sectionText} -->
-                                    </p>
                                 </g:if>
                                 <g:elseif test="${result.has("regionTypeName") && result.get("regionTypeName")}">
                                     <h4><g:message code="idxType.${result.idxType}"/>:

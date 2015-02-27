@@ -9,7 +9,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 
     <title><g:layoutTitle /></title>
-    <r:require modules="bootstrap2" />
+    <r:require modules="bootstrap2,  pagination" />
     <style type="text/css">
     body {
         background-color: #ffffff !important;
@@ -41,7 +41,6 @@
     <g:layoutHead />
 </head>
 <body class="${pageProperty(name:'body.class')?:'nav-collections'}" id="${pageProperty(name:'body.id')}" onload="${pageProperty(name:'body.onload')}">
-
 <div class="navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner ">
         <div class="container">
