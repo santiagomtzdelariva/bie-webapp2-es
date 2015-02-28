@@ -179,7 +179,7 @@
                             </div>
                         </div>
                         <div class="span3">
-                            <label class="control-labelXX" for="sortField">Sort by</label>
+                            <label class="control-label" for="sortField">Sort by</label>
                             <div class="controls">
                                 <select id="sortField" name="sort" class="input-medium">
                                     <option value="score" ${(params.sortField == 'score') ? "selected=\"selected\"" : ""}>best match</option>
@@ -190,7 +190,7 @@
                             </div>
                         </div>
                         <div class="span3">
-                            <label class="control-labelXX" for="dir">Sort order</label>
+                            <label class="control-label" for="dir">Sort order</label>
                             <div class="controls">
                                 <select id="dir" name="dir" class="input-small">
                                     <option value="asc" ${(params.dir == 'asc') ? "selected=\"selected\"" : ""}>normal</option>
@@ -200,7 +200,7 @@
                         </div>
                     </div><!--sortWidget-->
                     <input type="hidden" value="${pageTitle}" name="title"/>
-                    <div class="resultsXX">
+                    <div class="results-list">
                         <g:each var="result" in="${searchResults.results}">
                             <g:set var="sectionText"><g:if test="${!facetMap.idxtype}"><span><b>Section:</b> <g:message code="idxType.${result.idxType}"/></span></g:if></g:set>
                                 <g:if test="${result.has("idxType") && result.idxType == 'TAXON'}">

@@ -53,22 +53,13 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ":hibernate:3.6.10.15"
-        runtime ":jquery:1.7.2"
+        runtime ":jquery:1.11.1"
         runtime ":resources:1.2.8"
-        // Uncomment these (or add new ones) to enable additional resources capabilities
-        //runtime ":zipped-resources:1.0"
-        //runtime ":yui-minify-resources:0.1.4"
-        // Moved these plugins from application.properties file
         compile ':cache:1.0.1'
-        //runtime ":cached-resources:1.1"
-        //runtime ":cache-headers:1.1.6"
         runtime ":rest:0.8"
-
         compile(":ala-web-theme:0.8.5") {
             excludes "jquery","resources","cache","servlet-api"
         }
-
         build ":tomcat:7.0.53"
     }
 }
