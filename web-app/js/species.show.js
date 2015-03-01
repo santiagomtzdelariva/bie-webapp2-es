@@ -27,8 +27,9 @@
  */
 function showSpeciesPage() {
 
-    console.log("Starting showSpeciesPage");
-    console.log(SHOW_CONF);
+    console.log("Starting show species page");
+
+    loadOverviewImages();
 
     var bhlInit = false;
     var galleryInit = false;
@@ -113,25 +114,6 @@ function showSpeciesPage() {
         });
     });
 
-    // LSID link to show popup with LSID info and links
-    $("a#lsid").fancybox({
-        closeClick : false,
-        helpers:  { title: null },
-        width: '70%',
-        height: '70%',
-        maxWidth: 640,
-        fitToView: false
-    });
-
-    // LSID link to show popup data links
-    $("a#dataLinks").fancybox({
-        closeClick : false,
-        helpers:  { title: null },
-        width: '70%',
-        height: '70%',
-        maxWidth: 640,
-        fitToView: false
-    });
 
     // Charts via collectory charts.js
     var chartOptions = {
@@ -154,7 +136,6 @@ function showSpeciesPage() {
     console.log("chartOptions");
     console.log(chartOptions);
 
-
     loadFacetCharts(chartOptions);
     //facetChartGroup.loadAndDrawFacetCharts(chartOptions);
 
@@ -166,7 +147,7 @@ function showSpeciesPage() {
         var searchString = "?q=" + SHOW_CONF.guid;
         //console.log("fqueries",fqueries, query);
         var url = SHOW_CONF.alertsUrl + "createBiocacheNewRecordsAlert?";
-        url += "queryDisplayName="+encodeURIComponent(query);
+        url += "queryDisplayName=" + encodeURIComponent(query);
         url += "&baseUrlForWS=" + encodeURIComponent(SHOW_CONF.biocacheUrl);
         url += "&baseUrlForUI=" + encodeURIComponent(SHOW_CONF.serverName);
         url += "&webserviceQuery=%2Fws%2Foccurrences%2Fsearch" + encodeURIComponent(searchString);
@@ -186,7 +167,6 @@ function showSpeciesPage() {
     // add expert distrobution map
     addExpertDistroMap();
 
-    loadOverviewImages();
 
     //Trove search results
     setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
@@ -210,9 +190,12 @@ function loadGalleries() {
 function loadOverviewImages(){
 
     //TODO a toggle between LSID based searches and names searches
-    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=' +
+    var url = SHOW_CONF.biocacheServiceUrl  +
+        '/occurrences/search.json?q=' +
         SHOW_CONF.scientificName +
         '&fq=multimedia:"Image"&facet=off&pageSize=4&start=0&callback=?';
+
+    console.log('Loading images from: ' + url);
 
     $.getJSON(url, function(data){
         if (data && data.totalRecords > 0) {
@@ -222,24 +205,27 @@ function loadOverviewImages(){
             var $categoryTmpl = $('#overviewImages');
             $categoryTmpl.removeClass('hide');
 
-            var $mainOverviewImage = $('#mainOverviewImage');
+            var $mainOverviewImage = $('.mainOverviewImage');
             $mainOverviewImage.attr('src', data.occurrences[0].largeImageUrl);
-            $('#mainOverviewImageInfo').html(data.occurrences[0].dataResourceName);
+            $mainOverviewImage.parent().attr('href', data.occurrences[0].largeImageUrl);
+            $mainOverviewImage.parent().attr('data-title', data.occurrences[0].dataResourceName);
+            $mainOverviewImage.parent().attr('data-footer', data.occurrences[0].dataResourceName);
 
-            var $secondOverviewImage = $('#secondOverviewImage');
+            $('.mainOverviewImageInfo').html(data.occurrences[0].dataResourceName);
+
+            var $secondOverviewImage = $('.secondOverviewImage');
             $secondOverviewImage.attr('src', data.occurrences[1].smallImageUrl);
 
-            var $thirdOverviewImage = $('#thirdOverviewImage');
+            var $thirdOverviewImage = $('.thirdOverviewImage');
             $thirdOverviewImage.attr('src', data.occurrences[2].smallImageUrl);
+
+            $('.lightbox-img').ekkoLightbox(options);
         }
     }).fail(function(jqxhr, textStatus, error) {
         alert('Error loading gallery: ' + textStatus + ', ' + error);
     }).always(function() {
         $('#gallerySpinner').hide();
     });
-
-
-
 }
 
 /**
@@ -270,9 +256,6 @@ function loadGalleryType(category, start) {
         SHOW_CONF.scientificName +
         '&fq=multimedia:"Image"&pageSize=' + pageSize +
         '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
-
-//    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=lsid:' + SHOW_CONF.guid
-//        + '&fq=multimedia:"Image"&pageSize=' + pageSize + '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
 
     $.getJSON(url, function(data){
         if (data && data.totalRecords > 0) {
@@ -512,12 +495,10 @@ function addExpertDistroMap() {
     $.getJSON(url, function(data){
         if (data.available) {
             $("#expertDistroDiv img").attr("src", data.url);
-
             if (data.dataResourceName && data.dataResourceUrl) {
                 var attr = $('<a>').attr('href', data.dataResourceUrl).text(data.dataResourceName)
                 $("#expertDistroDiv #dataResource").html(attr);
             }
-
             $("#expertDistroDiv").show();
         }
     })

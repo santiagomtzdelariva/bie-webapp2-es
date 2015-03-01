@@ -30,6 +30,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${tc?.taxonConcept?.nameString} ${(tc?.commonNames) ? ' : ' + tc?.commonNames?.get(0)?.nameString : ''} | ${raw(grailsApplication.config.skin.orgNameLong)}</title>
     <meta name="layout" content="uk-bs3"/>
+    <r:require module="show"/>
 </head>
 <body class="page-taxon">
         <section class="container">
@@ -70,23 +71,39 @@
                         <div class="row taxon-row">
                             <div class="col-md-6">
 
-                                
+
                                 <div class="taxon-summary-gallery">
                                     <div class="main-img">
-                                        <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="images/demo-taxon-main.jpg"><img class="img-responsive" src="http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg"></a>
-                                        <div class="caption">Encylopedia of Life</div>
+
+                                        <a class="lightbox-img"
+                                           data-toggle="lightbox"
+                                           data-gallery="taxon-summary-gallery"
+                                           data-parent=".taxon-summary-gallery"
+                                           data-title=""
+                                           data-footer=""
+                                           href="">
+                                            <img class="mainOverviewImage img-responsive" src="">
+                                        </a>
+                                        <div class="caption mainOverviewImageInfo"></div>
                                     </div>
+
+
                                     <div class="thumb-row">
-                                        <div class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg)">
-                                            <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="images/demo-taxon-thumb-1.jpg"></a>
+                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
+                                            <a data-toggle="lightbox"
+                                               data-gallery="taxon-summary-gallery"
+                                               data-parent=".taxon-summary-gallery"
+                                               data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758"
+                                               data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>"
+                                               href="INSERT_URL"></a>
                                         </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg)">
-                                            <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="images/demo-taxon-thumb-2.jpg"></a>
+                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
+                                            <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="INSERT_URL"></a>
                                         </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg)">
+                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
                                             <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="images/demo-taxon-thumb-3.jpg"></a>
                                         </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(images/demo-taxon-thumb-4.jpg)">
+                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
                                             <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
                                         </div>
                                     </div>
@@ -142,8 +159,8 @@
                                 <div class="taxon-map">
                                     <div id="leafletMap"></div>
                                     <div class="map-buttons">
-                                        <a class="btn btn-primary btn-lg" href="#" role="button">View Interactive Map</a>
-                                        <a class="btn btn-primary btn-lg" href="#" role="button">View Locations</a>
+                                        <a class="btn btn-primary btn-lg" href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString}#tab_mapView" role="button">View Interactive Map</a>
+                                        <a class="btn btn-primary btn-lg" href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString}#tab_recordsView" role="button">View Locations</a>
                                     </div>
                                 </div>
 
@@ -252,129 +269,202 @@
                     </section>
 
                     <section class="tab-pane fade" id="names">
-                        <h2>Names and sources</h2>
-                        <div class="table-responsive">
-                            <table class="name-table table table-condensed">
-                                <thead>
-                                <tr>
-                                    <th>Accepted name</th>
-                                    <th>Source</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td><i>Erinaceus europaeus</i></td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">SNH List of Gaelic Names</a></li>
-                                        </ul>
+                    <h2>Names and sources</h2>
+                    <table class="table name-table  table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Accepted name</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${sciNameFormatted} ${authorship}</td>
+                                <td class="source">
+                                    <ul><li><a href="${tc.taxonConcept.infoSourceURL}" target="_blank" class="external">${tc.taxonConcept.infoSourceName}</a></li></ul>
+                                </td>
+                            </tr>
+                            <g:if test="${(tc.taxonName && tc.taxonName.publishedIn) || tc.taxonConcept.publishedIn}">
+                                <tr class="cite">
+                                    <td colspan="2">
+                                        <cite>Published in: <a href="#" target="_blank" class="external">${tc.taxonName?.publishedIn?:tc.taxonConcept.publishedIn}</a></cite>
                                     </td>
                                 </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="name-table table table-condensed">
-                                <thead>
+                            </g:if>
+                        </tbody>
+                    </table>
+
+                    <g:if test="${tc.synonyms}">
+                        <table class="table name-table table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Synonyms</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <g:each in="${tc.synonyms}" var="synonym">
+                                    <tr>
+                                        <td><bie:formatSciName name="${synonym.nameString}" rankId="${tc.taxonConcept?.rankID}"/> ${synonym.author}</td>
+                                        <td class="source">
+                                            <ul>
+                                                <g:if test="${!synonym.infoSourceURL}"><li><a href="${tc.taxonConcept.infoSourceURL}" target="_blank" class="external">${tc.taxonConcept.infoSourceName}</a></li></g:if>
+                                                <g:else><li><a href="${synonym.infoSourceURL}" target="_blank" class="external">${synonym.infoSourceName}</a></li></g:else>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <g:if test="${synonym.publishedIn || synonym.referencedIn}">
+                                        <tr class="cite">
+                                            <td colspan="2">
+                                                <cite>Published in: <span class="publishedIn">${synonym.publishedIn?:synonym.referencedIn}</span></cite>
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                </g:each>
+                            </tbody>
+                        </table>
+                    </g:if>
+                    <g:if test="${tc.commonNames}">
+                        <table class="table name-table table-responsive">
+                            <thead>
                                 <tr>
                                     <th>Common name</th>
                                     <th>Source</th>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td> Hedgehog </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> West European Hedgehog </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> draenog </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> draenogod </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> gràineag </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> gràineagan </td>
-                                    <td class="source">
-                                        <ul>
-                                            <li><a href="#">UK Species Inventory</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                            </thead>
+                            <tbody>
+                                <g:each in="${sortCommonNameSources}" var="cn">
+                                    <g:set var="cNames" value="${cn.value}" />
+                                    <%-- special treatment for <div> id and cookie name/value. matchup with Ranking Controller.rankTaxonCommonNameByUser --%>
+                                    <g:set var="nkey" value="${cn.key}" />
+                                    <g:set var="fName" value="${nkey?.trim()?.hashCode()}" />
+                                    <%-- javascript treatment: manual translate special character, because string:encodeURL cannot handle non-english character --%>
+                                    <g:set var="enKey" value="${nkey?.encodeAsJavaScript()}" />
+                                    <tr>
+                                        <td>
+                                            ${nkey}
+                                            <g:if test="${!isReadOnly}">
+                                                <g:if test="${!rankedImageUris?.contains(fName)}">
+                                                    <g:if test="${cNames}">
+                                                        <div id='cnRank-${fName}' class="rankCommonName">
+                                                            Is this a preferred common name for this ${tc.taxonConcept.rankString}?
+                                                            <a class="isrepresent" href="#" onclick="rankThisCommonName('${guid}','${fName}',false,true,'${enKey.trim()}');return false;">YES</a>
+                                                            |
+                                                            <a class="isnotrepresent" href="#" onclick="rankThisCommonName('${guid}','${fName}',false,false,'${enKey.trim()}');return false;">NO</a>
+                                                        </div>
+                                                    </g:if>
+                                                </g:if>
+                                            </g:if>
+                                        </td>
+                                        <td class="source">
+                                            <ul>
+                                            <g:each in="${sortCommonNameSources?.get(nkey)}" var="commonName">
+                                                <li><a href="${commonName.infoSourceURL}" onclick="window.open(this.href); return false;">${commonName.infoSourceName}</a></li>
+                                            </g:each>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </g:each>
+                        </tbody></table>
+                    </g:if>
                     </section>
 
                     <section class="tab-pane fade" id="classification">
-                        <h2>UK Species Inventory Classification</h2>
-                        <dl class="classification-list">
-                            <dd><a title="unranked" href="/bie-webapp2/species/NHMSYS0021048735#classification"> Biota </a> </dd>
-                            <dl>
-                                <dt>kingdom</dt>
-                                <dd><a title="kingdom" href="/bie-webapp2/species/NBNSYS0100001342#classification"> Animalia </a> </dd>
-                                <dl>
-                                    <dt>phylum</dt>
-                                    <dd><a title="phylum" href="/bie-webapp2/species/NBNSYS0100002380#classification"> Chordata </a> </dd>
-                                    <dl>
-                                        <dt>class</dt>
-                                        <dd><a title="class" href="/bie-webapp2/species/NHMSYS0000376154#classification"> Mammalia </a> </dd>
-                                        <dl>
-                                            <dt>order</dt>
-                                            <dd><a title="order" href="/bie-webapp2/species/NHMSYS0000376155#classification"> Insectivora </a> </dd>
-                                            <dl>
-                                                <dt>family</dt>
-                                                <dd><a title="family" href="/bie-webapp2/species/NHMSYS0000376156#classification"> Erinaceidae </a> </dd>
-                                                <dl>
-                                                    <dt>genus</dt>
-                                                    <dd><a title="genus" href="/bie-webapp2/species/NBNSYS0000132952#classification"> <i>Erinaceus</i> </a> </dd>
-                                                    <dl>
-                                                        <dt class="current">species</dt>
-                                                        <dd><i>Erinaceus europaeus</i></dd>
-                                                    </dl>
-                                                </dl>
-                                            </dl>
-                                        </dl>
-                                    </dl>
-                                </dl>
-                            </dl>
+
+                        <style type="text/css">
+                        section#classification dl#classificationList {
+                            margin-left:0;
+                        }
+                        section#classification dl {
+                            margin:4px 0 0 24px;
+                        }
+                        @media screen and (max-width: 600px) {
+                            section#classification dl {
+                                margin:4px 0 0 0px;
+                            }
+                        }
+                        section#classification dl dt {
+                            float:left;
+                            padding-right:10px;
+                        }
+                        section#classification dl  dd {
+                            /*float:left;*/
+                            padding-top: 1px;
+                            display: block;
+                            /*margin: 0;*/
+                        }
+                        section#classification dd img {
+                            vertical-align:middle;
+                        }
+                        section#classification dl.childClassification dt,section#classification dl.childClassification dd{
+                            float:none;
+                        }
+                        </style>
+
+                        <h2>
+                            <g:if test="${grailsApplication.config.classificationSupplier}">${grailsApplication.config.classificationSupplier}</g:if>
+                            Classification
+                        </h2>
+                        <g:each in="${taxonHierarchy}" var="taxon">
+                            <!-- taxon = ${taxon} -->
+                            <g:if test="${taxon.guid != tc.taxonConcept.guid}">
+                                <dl><dt><g:if test="${taxon.rankId?:0 !=0}">${taxon.rank}</g:if></dt>
+                                <dd><a href="${request?.contextPath}/species/${taxon.guid}#classification" title="${taxon.rank}">
+                                    <bie:formatSciName name="${taxon.scientificName}" rankId="${taxon.rankId?:0}"/>
+                                    <g:if test="${taxon.commonNameSingle}">: ${taxon.commonNameSingle}</g:if></a>
+                                </dd>
+                            </g:if>
+                            <g:elseif test="${taxon.guid == tc.taxonConcept.guid}">
+                                <dl><dt id="currentTaxonConcept">${taxon.rank}</dt>
+                                <dd><span><bie:formatSciName name="${taxon.scientificName}" rankId="${taxon.rankId?:0}"/>
+                                    <g:if test="${taxon.commonNameSingle}">: ${taxon.commonNameSingle}</g:if></span>
+                                    <g:if test="${taxon.isAustralian || tc.isAustralian}">
+                                        &nbsp;<span><img src="${grailsApplication.config.ala.baseURL}/wp-content/themes/ala2011/images/status_native-sm.png" alt="Recorded in Australia" title="Recorded in Australia" width="21" height="21"></span>
+                                    </g:if>
+                                </dd>
+                            </g:elseif>
+                            <g:else><!-- Taxa ${taxon}) should not be here! --></g:else>
+                        </g:each>
+                        <dl class="child-taxa">
+                            <g:set var="currentRank" value=""/>
+                            <g:each in="${childConcepts}" var="child" status="i">
+                                <g:set var="currentRank" value="${child.rank}"/>
+                                <dt>${child.rank}</dt>
+                                <g:set var="taxonLabel"><bie:formatSciName name="${child.nameComplete ? child.nameComplete : child.name}"
+                                                                           rankId="${child.rankId?:0}"/><g:if test="${child.commonNameSingle}">: ${child.commonNameSingle}</g:if></g:set>
+                                <dd><a href="${request?.contextPath}/species/${child.guid}#classification">${taxonLabel.trim()}</a>&nbsp;
+                                    <span>
+                                        <g:if test="${child.isAustralian}">
+                                            <img src="${grailsApplication.config.ala.baseURL}/wp-content/themes/ala2011/images/status_native-sm.png" alt="Recorded in Australia" title="Recorded in Australia" width="21" height="21">
+                                        </g:if>
+                                        <g:else>
+                                            <g:if test="${child.guid?.startsWith('urn:lsid:catalogueoflife.org:taxon')}">
+                                                <span class="inferredPlacement" title="Not recorded in Australia">[inferred placement]</span>
+                                            </g:if>
+                                            <g:else>
+                                                <span class="inferredPlacement" title="Not recorded in Australia"></span>
+                                            </g:else>
+                                        </g:else>
+                                    </span>
+                                </dd>
+                            </g:each>
                         </dl>
+                        <g:each in="${taxonHierarchy}" var="taxon">
+                            </dl>
+                        </g:each>
                     </section>
 
                     <section class="tab-pane fade" id="records">
-                        <h2>Occurence records</h2>
-                        <p><a href="http://ala-demo.gbif.org/generic-hub/occurrences/search?q=Erinaceus europaeus">View list of all <span id="occurenceCount">39,769</span> occurrence records for this taxon</a></p>
-                        <h3>Breakdown of occurrence records</h3>
-                        <p>Responsive Google charts go here.</p>
+                        <h2>Occurrence records</h2>
+                        <div id="occurrenceRecords">
+                            <p><a href="${biocacheUrl}/occurrences/search?q=${tc?.taxonConcept?.nameString?:''}">View
+                            list of all <span id="occurenceCount"></span> occurrence records for this taxon</a></p>
+                            <div id="recordBreakdowns" style="display: block;">
+                                <h2>Charts showing breakdown of occurrence records</h2>
+                                <div id="chartsHint">Hint: click on chart elements to view that subset of records</div>
+                                <div id="charts" class=""></div>
+                            </div>
+                        </div>
                     </section>
 
                     <section class="tab-pane fade" id="literature">
@@ -473,7 +563,160 @@
                 </div>
             </div>
         </div><!-- end main-content -->
-
     </section>
+<r:script>
+        // global var to pass GSP vars into JS file
+        var SHOW_CONF = {
+            biocacheUrl:        "${grailsApplication.config.biocache.baseURL}",
+            biocacheServiceUrl: "${grailsApplication.config.biocacheService.baseURL}",
+            collectoryUrl:      "${grailsApplication.config.collectory.baseURL}",
+            guid:               "${guid}",
+            scientificName:     "${tc?.taxonConcept?.nameString?:''}",
+            synonymsQuery:      "${synonymsQuery}",
+            citizenSciUrl:      "${citizenSciUrl}",
+            serverName:         "${grailsApplication.config.grails.serverURL}",
+            bieUrl:             "${grailsApplication.config.bie.baseURL}",
+            alertsUrl:          "${grailsApplication.config.alerts.baseUrl}",
+            remoteUser:         "${request.remoteUser?:''}",
+            eolUrl:             "${createLink(controller: 'externalSite', action:'eol',params:[s:tc?.taxonConcept?.nameString?:''])}",
+            genbankUrl:         "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
+            scholarUrl:         "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
+            soundUrl:           "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}"
+        }
+        // load google charts api
+        google.load("visualization", "1", {packages:["corechart"]});
+
+        $(function(){
+
+            //load EOL content
+            $.ajax({url: SHOW_CONF.eolUrl}).done(function ( data ) {
+                console.log(data);
+                console.log('Loading EOL content - ' + data.dataObjects.length);
+                //clone a description template...
+                if(data.dataObjects){
+                    console.log('Loading EOL content - ' + data.dataObjects.length);
+                    $.each(data.dataObjects, function(idx, dataObject){
+                        if(dataObject.language == "${grailsApplication.config.eol.lang}"){
+                            var $description = $('#descriptionTemplate').clone()
+                            $description.css({'display':'block'});
+                            $description.attr('id', dataObject.id);
+                            $description.find(".title").html(dataObject.title);
+                            $description.find(".content").html(dataObject.description);
+                            $description.find(".sourceLink").attr('href',dataObject.source);
+                            $description.find(".sourceLink").html(dataObject.rightsHolder)
+                            $description.find(".rights").html(dataObject.rights)
+                            $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
+                            $description.find(".providedBy").html("Encyclopedia of Life")
+                            $description.appendTo('#descriptiveContent');
+                        }
+                    });
+                }
+            });
+
+            //load Genbank content
+            $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
+                $('#genbankResultCount').html('-  <a href="' + data.resultsUrl + '"> view all results - ' + data.total + '</a>');
+                if(data.results){
+                    $.each(data.results, function(idx, result){
+                       $('#genbank').append('<tr><td>'+
+                            '<a class="externalLink" href="' + result.link + '">' + result.title + '</a><br/>' +
+                            '<span class="">' + result.description + '</span><br/>' +
+                            '<span class="">' + result.furtherDescription +'</span></td></tr>');
+                    });
+                }
+            });
+
+            //load sound content
+            $.ajax({url: SHOW_CONF.soundUrl}).done(function ( data ) {
+                if(data.sounds){
+                    $('#sounds').append('<h3 style="clear:left;">Sounds</h3>');
+                    $('#sounds').append('<audio src="' + data.sounds[0].alternativeFormats['audio/mpeg'] + '" preload="auto" />' );
+                    audiojs.events.ready(function() {
+                        var as = audiojs.createAll();
+                    });
+                    var source = "";
+                    if(data.processed.attribution.collectionName){
+                        source = data.processed.attribution.collectionName
+                    } else {
+                        source = data.processed.attribution.dataResourceName
+                    }
+                    $('#sounds').append('<span>Source: ' + source + '</span><br/>' );
+                    $('#sounds').append('<span><a href="${biocacheUrl}/occurrence/'+ data.raw.uuid +'">View more details of this audio</a></span>' );
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                //alert( "error" + errorThrown);
+            });
+
+            loadMap();
+
+            showSpeciesPage();
+        })
+
+        function loadMap() {
+            //add an occurrence layer for this taxon
+            var taxonLayer = L.tileLayer.wms(SHOW_CONF.biocacheServiceUrl + "/mapping/wms/reflect?q=" + SHOW_CONF.scientificName, {
+                layers: 'ALA:occurrences',
+                format: 'image/png',
+                transparent: true,
+                attribution: "${raw(grailsApplication.config.skin.orgNameLong)}",
+                bgcolor: "0x000000",
+                outline: "true",
+                ENV: "color:5574a6;name:circle;size:4;opacity:1"
+            });
+
+            var speciesLayers = new L.LayerGroup();
+            taxonLayer.addTo(speciesLayers);
+
+            var map = L.map('leafletMap', {
+                center: [54.6, -3.2],
+                zoom: 5,
+                layers: [speciesLayers]
+            });
+
+            var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="http://mapbox.com">Mapbox</a>';
+            var mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+            var defaultBaseLayer = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr});
+
+            defaultBaseLayer.addTo(map);
+
+            var baseLayers = {
+                "Default": defaultBaseLayer
+            };
+
+            var overlays = {
+                "${sciNameFormatted}": taxonLayer
+            };
+
+            L.control.layers(baseLayers, overlays).addTo(map);
+
+            map.on('click', onMapClick);
+            map.invalidateSize(false);
+        }
+
+        function onMapClick(e) {
+            $.ajax({
+                url: SHOW_CONF.biocacheServiceUrl + "/occurrences/info",
+                jsonp: "callback",
+                dataType: "jsonp",
+                data: {
+                    q: SHOW_CONF.scientificName,
+                    zoom: "6",
+                    lat: e.latlng.lat,
+                    lon: e.latlng.lng,
+                    radius: 20,
+                    format: "json"
+                },
+                success: function (response) {
+                    var popup = L.popup()
+                            .setLatLng(e.latlng)
+                            .setContent("Occurrences at this point: " + response.count)
+                            .openOn(map);
+                }
+            });
+        }
+</r:script>
+
 </body>
 </html>

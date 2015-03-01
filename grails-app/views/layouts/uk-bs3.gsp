@@ -49,10 +49,10 @@
         <div class="container">
             <div class="global-search">
                 <div class="global-search-box">
-                    <form>
-                        <input type="text" placeholder="Search everything...">
+                    <g:form controller="species" action="search" method="get">
+                        <input type="text" name="q" placeholder="Search everything...">
                         <input type="submit" value="Search">
-                    </form>
+                    </g:form>
                 </div>
             </div>
             <nav class="navbar">
@@ -61,11 +61,11 @@
                 </div>
                 <div class="collapse navbar-collapse" id="navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li><a href="http://ala-demo.gbif.org/bie-webapp2/search">Species</a></li>
-                        <li><a href="http://ala-demo.gbif.org/generic-hub/explore/your-area?default=true">Locations</a></li>
+                        <li><g:link controller="species" action="search">Species</g:link></li>
+                        <li><a href="${grailsApplication.config.biocache.baseURL}/explore/your-area?default=true">Locations</a></li>
                         <li><a href="#">Habitats</a></li>
-                        <li><a href="http://ala-demo.gbif.org/generic-hub/search">Records</a></li>
-                        <li><a href="#">Data Providers</a></li>
+                        <li><a href="${grailsApplication.config.biocache.baseURL}/search">Records</a></li>
+                        <li><a href="${grailsApplication.config.collectory.baseURL}/datasets">Data Providers</a></li>
                         <li class="visible-sm visible-xs"><a href="#">Getting Started</a></li>
                         <li class="visible-sm visible-xs"><a href="#">Examples of Use</a></li>
                         <li class="visible-sm visible-xs"><a href="#">Documentation</a></li>
