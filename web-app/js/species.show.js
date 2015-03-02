@@ -30,25 +30,29 @@ function showSpeciesPage() {
     console.log("Starting show species page");
 
     loadOverviewImages();
+    loadGalleries();
+    doBhlSearch(0, 10, false);
 
-    var bhlInit = false;
-    var galleryInit = false;
-    $('a[data-toggle="tab"]').on('shown', function(e) {
-        //console.log("this", $(this).attr('id'));
-        var id = $(this).attr('id');
-        if (id == "t6" && !bhlInit) {
-            doBhlSearch(0, 10, false);
-            bhlInit = true;
-        } else if (id == "t2" && !galleryInit) {
-            loadGalleries();
-            galleryInit = true;
-        }
-        if (id != "t1") {
-            location.hash = 'tab_'+ $(e.target).attr('href').substr(1);
-        } else {
-            location.hash = '';
-        }
-    });
+    //
+    //var bhlInit = false;
+    //var galleryInit = false;
+    //$('a[data-toggle="tab"]').on('shown', function(e) {
+    //    //console.log("this", $(this).attr('id'));
+    //    var id = $(this).attr('id');
+    //    if (id == "t6" && !bhlInit) {
+    //        doBhlSearch(0, 10, false);
+    //        bhlInit = true;
+    //    } else if (id == "t2" && !galleryInit) {
+    //        loadGalleries();
+    //        galleryInit = true;
+    //    }
+    //    if (id != "t1") {
+    //        location.hash = 'tab_'+ $(e.target).attr('href').substr(1);
+    //    } else {
+    //        location.hash = '';
+    //    }
+    //});
+
     //setup tabs
     if (location.hash !== '') {
         $('.nav-tabs a[href="' + location.hash.replace('tab_','') + '"]').tab('show');
@@ -64,61 +68,11 @@ function showSpeciesPage() {
         }
     });
 
-    // Gallery image popups using ColorBox
-    $('body').on('click', '.thumbImage', function() {
-        $("a.thumbImage").colorbox({
-            title: function () {
-                var titleBits = this.title.split("|");
-                return "<a href='" + titleBits[1] + "'>" + titleBits[0] + "</a>";
-            },
-            opacity: 0.5,
-            photo: true,
-            maxWidth: "80%",
-            maxHeight: "80%",
-            preloading: false,
-            onComplete: function () {
-                $("#cboxTitle").html(""); // Clear default title div
-                //console.log('colorbox onComplete', $(this));
-                var contentElement = $(this).find('.detail').clone();
-                var uuid = $(this).data('occurrenceuid');
-                $('#' + uuid).remove(); // clear previous data
-                var extraData = '<div class="rights">&nbsp;</div><div class="recordLink"><a href="' + SHOW_CONF.biocacheUrl + '/occurrences/' + uuid + '">View details of this record</a></div>';
-                contentElement.attr('id', $(this).data('id'));
-                contentElement.append(extraData);
-                //console.log("contentElement", contentElement.html(), uuid);
-                var titleHtml = contentElement.html(); // use index to load meta data
-                $("<div class='titleText' id='" + uuid + "'>" + titleHtml + "</div>").insertAfter("img.cboxPhoto");
-                $("div.titleText").css("padding-top", "8px");
-                var cbox = $.fn.colorbox;
-                if (cbox != undefined) {
-                    cbox.resize();
-                }
-
-                // load extra data via JSON GET
-                if (uuid) {
-                    var url = SHOW_CONF.biocacheServiceUrl + "/occurrences/" + uuid + ".json?callback=?";
-                    //console.log('occurrenceUid', occurrenceUid, url);
-                    $.ajax({
-                        url: url,
-                        dataType: "jsonp",
-                        async: false
-                    }).done(function (data) {
-                        //console.log('data.raw', data.raw);
-                        if (data.raw && data.raw.occurrence && data.raw.occurrence.rights) {
-                            //console.log('rights', data.raw.occurrence.rights, $('#' + uuid).html());
-                            $('#' + uuid).find('.rights').html('Rights: ' + data.raw.occurrence.rights);
-                        }
-                    });
-                }
-            }
-        });
-    });
-
-
     // Charts via collectory charts.js
     var chartOptions = {
         query: SHOW_CONF.scientificName,
         biocacheServicesUrl: SHOW_CONF.biocacheServiceUrl,
+        biocacheWebappUrl: SHOW_CONF.biocacheUrl,
         collectionsUrl: SHOW_CONF.collectoryUrl,
         totalRecordsSelector: "span#occurenceCount",
         chartsDiv: "recordBreakdowns",
@@ -167,7 +121,6 @@ function showSpeciesPage() {
     // add expert distrobution map
     addExpertDistroMap();
 
-
     //Trove search results
     setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
 }
@@ -180,16 +133,33 @@ function chartsError() {
  * Trigger loading of the 3 gallery sections
  */
 function loadGalleries() {
-    //alert('loading galleries');
+    console.log('loading galleries');
     $('#gallerySpinner').show();
     loadGalleryType('type', 0)
     loadGalleryType('specimen', 0)
     loadGalleryType('other', 0)
 }
 
+var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return entityMap[s];
+    });
+}
+
+/**
+ * Load overview images on the species page. This is separate from the main galleries.
+ */
 function loadOverviewImages(){
 
-    //TODO a toggle between LSID based searches and names searches
     var url = SHOW_CONF.biocacheServiceUrl  +
         '/occurrences/search.json?q=' +
         SHOW_CONF.scientificName +
@@ -201,7 +171,7 @@ function loadOverviewImages(){
         if (data && data.totalRecords > 0) {
 
             $('#noOverviewImages').addClass('hide');
-
+            $('.thumb-row').removeClass('hide');
             var $categoryTmpl = $('#overviewImages');
             $categoryTmpl.removeClass('hide');
 
@@ -213,19 +183,34 @@ function loadOverviewImages(){
 
             $('.mainOverviewImageInfo').html(data.occurrences[0].dataResourceName);
 
-            var $secondOverviewImage = $('.secondOverviewImage');
-            $secondOverviewImage.attr('src', data.occurrences[1].smallImageUrl);
-
-            var $thirdOverviewImage = $('.thirdOverviewImage');
-            $thirdOverviewImage.attr('src', data.occurrences[2].smallImageUrl);
-
-            $('.lightbox-img').ekkoLightbox(options);
+            if(data.occurrences.length >= 2){
+                addOverviewThumb(data.occurrences[1], "1")
+            }
+            if(data.occurrences.length >= 3){
+                addOverviewThumb(data.occurrences[2], "1")
+            }
+            if(data.occurrences.length >= 4){
+                addOverviewThumb(data.occurrences[3], "1")
+            }
         }
+
     }).fail(function(jqxhr, textStatus, error) {
         alert('Error loading gallery: ' + textStatus + ', ' + error);
     }).always(function() {
         $('#gallerySpinner').hide();
     });
+}
+
+function addOverviewThumb(occurrence, id){
+    var $taxonSummaryThumb = $('#taxon-summary-thumb-template').clone();
+    var $taxonSummaryThumbLink = $taxonSummaryThumb.find('a');
+    $taxonSummaryThumb.removeClass('hide');
+    $taxonSummaryThumb.attr('id', 'taxon-summary-thumb-'+id);
+    $taxonSummaryThumb.attr('style', 'background-image:url(' + occurrence.smallImageUrl + ')');
+    $taxonSummaryThumbLink.attr('data-title', getImageTitleFromOccurrence(occurrence));
+    $taxonSummaryThumbLink.attr('data-footer', getImageFooterFromOccurrence(occurrence));
+    $taxonSummaryThumbLink.attr('href', occurrence.largeImageUrl);
+    $('#overview-thumbs').append($taxonSummaryThumb);
 }
 
 /**
@@ -235,15 +220,15 @@ function loadOverviewImages(){
  * @param start
  */
 function loadGalleryType(category, start) {
-    // type: &fq=multimedia:"Image"&fq=type_status:*&pageSize=100&facet=off
-    // specimen: &fq=multimedia:"Image"&fq=basis_of_record:PreservedSpecimen&fq=-type_status:*&pageSize=100&facet=off
-    // other: &fq=multimedia:"Image"&fq=-type_status:*&fq=-basis_of_record:PreservedSpecimen&pageSize=100&facet=off
+
+    console.log("Loading images category: " + category);
 
     var imageCategoryParams = {
         type: '&fq=type_status:*',
         specimen: '&fq=basis_of_record:PreservedSpecimen&fq=-type_status:*',
         other: '&fq=-type_status:*&fq=-basis_of_record:PreservedSpecimen'
     };
+
     var pageSize = 20;
 
     if (start > 0) {
@@ -252,49 +237,41 @@ function loadGalleryType(category, start) {
     }
 
     //TODO a toggle between LSID based searches and names searches
-    var url = SHOW_CONF.biocacheServiceUrl  + '/occurrences/search.json?q=' +
+    var url = SHOW_CONF.biocacheServiceUrl  +
+        '/occurrences/search.json?q=' +
         SHOW_CONF.scientificName +
         '&fq=multimedia:"Image"&pageSize=' + pageSize +
         '&facet=off&start=' + start + imageCategoryParams[category] + '&callback=?';
 
+    console.log("URL: " + url);
+
     $.getJSON(url, function(data){
+
+        console.log('Total images: ' + data.totalRecords + ", category: " + category);
+
         if (data && data.totalRecords > 0) {
             var br = "<br>";
             var $categoryTmpl = $('#cat_' + category);
             $categoryTmpl.removeClass('hide');
+            $('#cat_nonavailable').addClass('hide');
 
             $.each(data.occurrences, function(i, el) {
                 // clone template div & populate with metadata
-                var $ImgConTmpl = $('.imgConTmpl').clone();
-                $ImgConTmpl.removeClass('imgConTmpl').removeClass('hide');
-                var link = $ImgConTmpl.find('a.cbLink')
-                link.attr('id','thumb_' + category + i);
-                link.addClass('thumbImage tooltips');
-                link.attr('href', el.largeImageUrl);
-                link.attr('title', 'click to enlarge');
-                link.attr('data-id', category + i);
-                link.attr('data-occurrenceuid', el.uuid);
-                link.attr('data-category', category);
-                $ImgConTmpl.find('img').attr('src', el.smallImageUrl);
+                var $taxonThumb = $('#taxon-thumb-template').clone();
+                $taxonThumb.removeClass('hide');
+                $taxonThumb.attr('id','thumb_' + category + i);
+                $taxonThumb.attr('href', el.largeImageUrl);
+                $taxonThumb.find('img').attr('src', el.smallImageUrl);
+
                 // brief metadata
-                var briefHtml = el.raw_scientificName;
-                if (el.typeStatus) briefHtml += br + el.typeStatus;
-                if (el.institutionName) briefHtml += ((el.typeStatus) ? ' | ' : br) + el.institutionName;
-                $ImgConTmpl.find('.brief').html(briefHtml);
-                // detail metadata
-                var detailHtml = el.raw_scientificName;
-                if (el.typeStatus) detailHtml += br + 'Type: ' + el.typeStatus;
-                if (el.collector) detailHtml += br + 'By: ' + el.collector;
-                if (el.eventDate) detailHtml += br + 'Date: ' + moment(el.eventDate).format('YYYY-MM-DD');
-                if (el.institutionName) {
-                    detailHtml += br + el.institutionName;
-                } else {
-                    detailHtml += br + el.dataResourceName;
-                }
+                var briefHtml = getImageTitleFromOccurrence(el)
+                $taxonThumb.find('.caption-brief').html(briefHtml);
+                $taxonThumb.attr('data-title', briefHtml);
+                $taxonThumb.find('.caption-detail').html(briefHtml);
 
                 // write to DOM
-                $ImgConTmpl.find('.detail').html(detailHtml);
-                $categoryTmpl.find('.subGallery').append($ImgConTmpl.html());
+                $taxonThumb.attr('data-footer', getImageFooterFromOccurrence(el));
+                $categoryTmpl.find('.taxon-gallery').append($taxonThumb);
             });
 
             $('.loadMore.' + category).remove(); // remove 'load more images' button that was just clicked
@@ -313,6 +290,29 @@ function loadGalleryType(category, start) {
         $('#gallerySpinner').hide();
     });
 }
+
+function getImageTitleFromOccurrence(el){
+    var briefHtml = el.raw_scientificName;
+    if (el.typeStatus) briefHtml += br + el.typeStatus;
+    if (el.institutionName) briefHtml += ((el.typeStatus) ? ' | ' : br) + el.institutionName;
+    return briefHtml;
+}
+
+function getImageFooterFromOccurrence(el){
+    var detailHtml = el.raw_scientificName;
+    if (el.typeStatus) detailHtml += br + 'Type: ' + el.typeStatus;
+    if (el.collector) detailHtml += br + 'By: ' + el.collector;
+    if (el.eventDate) detailHtml += br + 'Date: ' + moment(el.eventDate).format('YYYY-MM-DD');
+    if (el.institutionName) {
+        detailHtml += '<br/>' + el.institutionName;
+    } else {
+        detailHtml += '<br/>'  + el.dataResourceName;
+    }
+    // write to DOM
+    detailHtml += '<div class="recordLink"><a href="' + SHOW_CONF.biocacheUrl + '/occurrences/' + el.uuid + '">View details of this record</a></div>';
+    return detailHtml;
+}
+
 
 /**
  * BHL search to populate literature tab
@@ -357,12 +357,11 @@ function doBhlSearch(start, rows, scroll) {
     var buf = "";
     $("#status-box").css("display", "block");
     $("#synonyms").html("").css("display", "none")
-    $("#results").html("");
+    $(".result-list").html("");
 
     $.ajax({
         url: url,
         dataType: 'jsonp',
-        //data: null,
         jsonp: "json.wrf",
         success:  function(data) {
             var itemNumber = parseInt(data.responseHeader.params.start, 10) + 1;
@@ -382,25 +381,23 @@ function doBhlSearch(start, rows, scroll) {
             var highlights = {};
             $.each(data.highlighting, function(idx, hl) {
                 highlights[idx] = hl.text[0];
-                //console.log("highlighting", idx, hl);
             });
             //console.log("highlighting", highlights, itemNumber);
             $.each(data.grouped.itemId.groups, function(idx, obj) {
-                buf += '<div class="result-box">';
-                buf += '<b>' + itemNumber++;
+                buf += '<div class="result">';
+                buf += '<h3><b>' + itemNumber++;
                 buf += '.</b> <a target="item" href="http://biodiversitylibrary.org/item/' + obj.groupValue + '">' + obj.doclist.docs[0].name + '</a> ';
                 var suffix = '';
                 if (obj.doclist.numFound > 1) {
                     suffix = 's';
                 }
-                buf += '(' + obj.doclist.numFound + '</b> matching page' + suffix + ')<div class="thumbnail-container">';
+                buf += '(' + obj.doclist.numFound + '</b> matching page' + suffix + ')</h3><div class="thumbnail-container">';
 
                 $.each(obj.doclist.docs, function(idx, page) {
                     var highlightText = $('<div>'+highlights[page.pageId]+'</div>').htmlClean({allowedTags: ["em"]}).html();
                     buf += '<div class="page-thumbnail"><a target="page image" href="http://biodiversitylibrary.org/page/' +
                         page.pageId + '"><img src="http://biodiversitylibrary.org/pagethumb/' + page.pageId +
-                        '" alt="Page Id ' + page.pageId + '"  width="60px" height="100px"/><div class="highlight-context">' +
-                        highlightText + '</div></a></div>';
+                        '" alt="' + escapeHtml(highlightText) + '"  width="60px" height="100px"/></a></div>';
                 })
                 buf += "</div><!--end .thumbnail-container -->";
                 buf += "</div>";
@@ -411,12 +408,17 @@ function doBhlSearch(start, rows, scroll) {
             //console.log("nav buttons", prevStart, nextStart);
 
             buf += '<div id="button-bar">';
-            if (prevStart >= 0) buf += '<input type="button" class="btn" value="Previous page" onclick="doBhlSearch(' + prevStart + ',' + rows + ', true)">';
+            if (prevStart >= 0) {
+                buf += '<input type="button" class="btn" value="Previous page" onclick="doBhlSearch(' + prevStart + ',' + rows + ', true)">';
+            }
             buf += '&nbsp;&nbsp;&nbsp;';
-            if (nextStart <= maxItems) buf += '<input type="button" class="btn" value="Next page" onclick="doBhlSearch(' + nextStart + ',' + rows + ', true)">';
+            if (nextStart <= maxItems) {
+                buf += '<input type="button" class="btn" value="Next page" onclick="doBhlSearch(' + nextStart + ',' + rows + ', true)">';
+            }
+
             buf += '</div>';
 
-            $("#solr-results").html(buf);
+            $("#bhl-results-list").html(buf);
             if (data.synonyms) {
                 buf = "<b>Synonyms used:</b>&nbsp;";
                 buf += data.synonyms.join(", ");
@@ -441,53 +443,6 @@ function cancelSearch(msg) {
     $("#status-box").css("display", "none");
     $("#solr-results").html(msg);
     return true;
-}
-
-/**
- * Taken from bie-webapp (by Wai)
- * TODO needs to be improved to handle failed json GET (controller needs to return status code if failed?)
- *
- * @param guid
- * @param uri
- * @param infosourceId
- * @param documentId
- * @param blackList
- * @param positive
- * @param name
- */
-function rankThisImage(guid, uri, infosourceId, documentId, blackList, positive, name){
-    var encodedUri = escape(uri);
-    var controllerSuffix = (SHOW_CONF.remoteUser) ? "WithUser" : "";
-    var url = SHOW_CONF.bieUrl + "/rankTaxonImage" + controllerSuffix + ".json?guid="+guid+"&uri="+encodedUri+"&infosourceId="+infosourceId+"&blackList="+blackList+"&positive="+positive+"&name="+name+"&callback=?";
-    $('.imageRank-'+documentId).html('Sending your ranking....');
-    $.getJSON(url, function(data){ })
-    $('.imageRank-'+documentId).each(function(index) {
-        $(this).html('Thanks for your help!');
-    }).error(function(jqXHR, textStatus, errorThrown) {
-        // catch ajax errors (requires JQuery 1.5+) - usually 500 error
-        $(this).html('An error occurred: ' + errorThrown + " (" + jqXHR.status + ")");
-    });
-}
-
-function editThisImage(guid, uri){
-    var encodedUri = escape(uri);
-    var url = SHOW_CONF.bieUrl + "/admin/edit?guid="+guid+"&uri="+encodedUri;
-    window.open(url);
-}
-
-function rankThisCommonName(guid, documentId, blackList, positive, name) {
-    var controllerSuffix = (SHOW_CONF.remoteUser) ? "WithUser" : "";
-    var url = SHOW_CONF.bieUrl + "/rankTaxonCommonName" + controllerSuffix + ".json?guid="+guid+"&blackList="+blackList+"&positive="+positive+"&name="+name+"&callback=?";
-    var linkId = 'cnRank-'+documentId;
-    $('#cnRank-'+documentId).html('Sending your ranking....');
-    var jqxhr = $.getJSON(url, function(data){
-        $('#cnRank-'+documentId).each(function(index) {
-            $(this).html('Thanks for your help!');
-        });
-    }).error(function(jqXHR, textStatus, errorThrown) {
-        // catch ajax errors (requires JQuery 1.5+) - usually 500 error
-        $('#cnRank-'+documentId).html('An error occurred: ' + errorThrown + " (" + jqXHR.status + ")");
-    });
 }
 
 function addExpertDistroMap() {

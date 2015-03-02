@@ -38,7 +38,12 @@
             <div class="taxonomy-bcrumb">
                 <ol class="list-inline">
                     <g:each in="${taxonHierarchy}" var="taxon">
-                        <li><g:link controller="species" action="show" params="[guid:taxon.guid]">${taxon.scientificName}</g:link></li>
+                        <g:if test="${taxon.guid != tc.taxonConcept.guid}">
+                            <li><g:link controller="species" action="show" params="[guid:taxon.guid]">${taxon.scientificName}</g:link></li>
+                        </g:if>
+                        <g:else>
+                            <li>${taxon.scientificName}</li>
+                        </g:else>
                     </g:each>
                 </ol>
             </div>
@@ -87,52 +92,15 @@
                                         <div class="caption mainOverviewImageInfo"></div>
                                     </div>
 
-
-                                    <div class="thumb-row">
-                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
-                                            <a data-toggle="lightbox"
-                                               data-gallery="taxon-summary-gallery"
-                                               data-parent=".taxon-summary-gallery"
-                                               data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758"
-                                               data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>"
-                                               href="INSERT_URL"></a>
-                                        </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
-                                            <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="INSERT_URL"></a>
-                                        </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
-                                            <a data-toggle="lightbox" data-gallery="taxon-summary-gallery" data-parent=".taxon-summary-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="images/demo-taxon-thumb-3.jpg"></a>
-                                        </div>
-                                        <div class="taxon-summary-thumb" style="background-image:url(INSERT_URL)">
+                                    <div class="thumb-row hide">
+                                        <div id="overview-thumbs"></div>
+                                        <div class="taxon-summary-thumb" style="">
                                             <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
                                         </div>
                                     </div>
                                 </div>
 
-
-
-                                <div class="panel panel-default panel-description">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">Description</h3>
-                                    </div>
-                                    <div class="panel-body">
-                                        <p>The hedgehog is one of our most instantly recognisable native mammals, as it is the only British mammal to have spines (2). They are also characterised by their fairly short tails, long legs and small ears (6). Young hedgehogs are born with a coat of soft, white spines, which are underneath the skin to protect the mother during birth, but emerge after a few hours (7). A second coat of dark spines emerges after about 36 hours, and later on a third set develops. By 11 days of age the young hedgehogs can curl into a ball, and after 14 days the eyes open (8).</p>
-                                    </div>
-                                    <div class="panel-footer">
-                                        <p>Source: <a href="#">Arkive</a>, © Wildscreen</p>
-                                    </div>
-                                </div>
-
-                                <div class="panel panel-default panel-range">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">Range</h3>
-                                    </div>
-                                    <div class="panel-body">
-                                        <p>This species is found in western Europe (9). In Britain it is widely distributed, and has been introduced to several islands (5).</p>
-                                    </div>
-                                    <div class="panel-footer">
-                                        <p>Source: <a href="#">Arkive</a>, © Wildscreen</p>
-                                    </div>
+                                <div id="descriptiveContent">
                                 </div>
 
                                 <div class="panel panel-default panel-resources">
@@ -167,8 +135,8 @@
                                 <div class="panel panel-default panel-actions">
                                     <div class="panel-body">
                                         <ul class="list-unstyled">
-                                            <li><a href="http://sightings.ala.org.au/NBNSYS0000005078"><span class="glyphicon glyphicon-map-marker"></span> Record a sighting</a></li>
-                                            <li><a href="#"><span class="glyphicon glyphicon-camera"></span> Submit a photo</a></li>
+                                            <li><a href="${citizenSciUrl}${tc.taxonConcept.guid}"><span class="glyphicon glyphicon-map-marker"></span> Record a sighting</a></li>
+                                            <li><a href="${citizenSciUrl}${tc.taxonConcept.guid}"><span class="glyphicon glyphicon-camera"></span> Submit a photo</a></li>
                                             <li><a href="#"><span class="glyphicon glyphicon-download"></span> Download a fact sheet</a></li>
                                             <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Receive alerts when new records are added</a></li>
                                             <li><a href="#"><span class="glyphicon glyphicon-comment"></span> Start a topic about this species on the forum</a></li>
@@ -218,53 +186,25 @@
                     </section>
 
                     <section class="tab-pane fade" id="gallery">
-                        <h2>Images</h2>
-                        <div class="taxon-gallery">
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/3004/0d77f107-a398-4859-975f-4e59c7b656a9/ac22d947b72ef34373ed82dc80095364__large.JPG">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/3004/0d77f107-a398-4859-975f-4e59c7b656a9/ac22d947b72ef34373ed82dc80095364__small.JPG" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/13889/2a42adb7-4c16-428a-b0b7-748cc50cecdc/a0bcff2b89973544d64c58994251dfe0__large.jpg" id="thumb_other1">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/13889/2a42adb7-4c16-428a-b0b7-748cc50cecdc/a0bcff2b89973544d64c58994251dfe0__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/4597/b6044ce3-0bf3-4f91-8943-35a1bbef6239/65f7fa84a893b6ba163741ad08ea78a1__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/4597/b6044ce3-0bf3-4f91-8943-35a1bbef6239/65f7fa84a893b6ba163741ad08ea78a1__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/28411/eb46aebf-d3cc-4235-bca1-3ff8d668d6e8/47893b7013a338af78df075726cfc6fb__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/28411/eb46aebf-d3cc-4235-bca1-3ff8d668d6e8/47893b7013a338af78df075726cfc6fb__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/1792/5aca5e65-8b0d-4c7f-b897-3015e21b9fb1/d0bf93db04526b9cf156058f892b5f31__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/1792/5aca5e65-8b0d-4c7f-b897-3015e21b9fb1/d0bf93db04526b9cf156058f892b5f31__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/28762/718b856d-156c-45d9-a405-2580df4f8d4c/c20a7fd22b66c232c158e4d35d1673c4__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/28762/718b856d-156c-45d9-a405-2580df4f8d4c/c20a7fd22b66c232c158e4d35d1673c4__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/12808/54966da1-5026-4219-b420-b1ab90011c6c/1af1f69644267b75591540ccc012dfd7__large.JPG">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/12808/54966da1-5026-4219-b420-b1ab90011c6c/1af1f69644267b75591540ccc012dfd7__small.JPG" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
-                            <a class="taxon-thumb" data-toggle="lightbox" data-gallery="taxon-gallery" data-title="<i>Erinaceus europaeus</i> Linnaeus, 1758" data-footer="Encyclopedia of Life<br><a href='#'>View details of this record</a>" href="http://ala-demo.gbif.org/biocache-media/dr1089/31551/78aec885-450e-406c-bb02-f5d072672ac6/ce9f19ed88245bacc19a33c86d081228__large.jpg">
-                                <img src="http://ala-demo.gbif.org/biocache-media/dr1089/31551/78aec885-450e-406c-bb02-f5d072672ac6/ce9f19ed88245bacc19a33c86d081228__small.jpg" alt="Erinaceus europaeus image thumbnail">
-                                <div class="thumb-caption caption-brief"><i>Erinaceus europaeus</i> Linnaeus, 1758</div>
-                                <div class="thumb-caption caption-detail"><i>Erinaceus europaeus</i> Linnaeus, 1758<br>Encyclopedia of Life</div>
-                            </a>
+                        <div id="cat_types" class="hide">
+                            <h2>Types</h2>
+                            <div class="taxon-gallery"></div>
+                        </div>
+                        <div id="cat_specimens" class="hide">
+                            <h2>Specimens</h2>
+                            <div class="taxon-gallery"></div>
+                        </div>
+                        <div id="cat_other" class="hide">
+                            <h2>Images</h2>
+                            <div class="taxon-gallery"></div>
+                        </div>
+                        <div id="cat_nonavailable">
+                            <h2>No images available for this taxon</h2>
+                            <p>
+                                If you have images for this taxon that you would like to share
+                                with ${raw(grailsApplication.config.skin.orgNameLong)},
+                                please upload using the upload tools.
+                            </p>
                         </div>
                     </section>
 
@@ -388,15 +328,13 @@
                             padding-right:10px;
                         }
                         section#classification dl  dd {
-                            /*float:left;*/
                             padding-top: 1px;
                             display: block;
-                            /*margin: 0;*/
                         }
                         section#classification dd img {
                             vertical-align:middle;
                         }
-                        section#classification dl.childClassification dt,section#classification dl.childClassification dd{
+                        section#classification dl.childClassification dt,section#classification dl.childClassification dd {
                             float:none;
                         }
                         </style>
@@ -418,9 +356,6 @@
                                 <dl><dt id="currentTaxonConcept">${taxon.rank}</dt>
                                 <dd><span><bie:formatSciName name="${taxon.scientificName}" rankId="${taxon.rankId?:0}"/>
                                     <g:if test="${taxon.commonNameSingle}">: ${taxon.commonNameSingle}</g:if></span>
-                                    <g:if test="${taxon.isAustralian || tc.isAustralian}">
-                                        &nbsp;<span><img src="${grailsApplication.config.ala.baseURL}/wp-content/themes/ala2011/images/status_native-sm.png" alt="Recorded in Australia" title="Recorded in Australia" width="21" height="21"></span>
-                                    </g:if>
                                 </dd>
                             </g:elseif>
                             <g:else><!-- Taxa ${taxon}) should not be here! --></g:else>
@@ -433,19 +368,6 @@
                                 <g:set var="taxonLabel"><bie:formatSciName name="${child.nameComplete ? child.nameComplete : child.name}"
                                                                            rankId="${child.rankId?:0}"/><g:if test="${child.commonNameSingle}">: ${child.commonNameSingle}</g:if></g:set>
                                 <dd><a href="${request?.contextPath}/species/${child.guid}#classification">${taxonLabel.trim()}</a>&nbsp;
-                                    <span>
-                                        <g:if test="${child.isAustralian}">
-                                            <img src="${grailsApplication.config.ala.baseURL}/wp-content/themes/ala2011/images/status_native-sm.png" alt="Recorded in Australia" title="Recorded in Australia" width="21" height="21">
-                                        </g:if>
-                                        <g:else>
-                                            <g:if test="${child.guid?.startsWith('urn:lsid:catalogueoflife.org:taxon')}">
-                                                <span class="inferredPlacement" title="Not recorded in Australia">[inferred placement]</span>
-                                            </g:if>
-                                            <g:else>
-                                                <span class="inferredPlacement" title="Not recorded in Australia"></span>
-                                            </g:else>
-                                        </g:else>
-                                    </span>
                                 </dd>
                             </g:each>
                         </dl>
@@ -468,102 +390,83 @@
                     </section>
 
                     <section class="tab-pane fade" id="literature">
-                        <h2>Name references found in the Biodiversity Heritage Library</h2>
-                        <p>Showing 1 to 10 of 937 results for the query <strong>"Erinaceus europaeus"</strong></p>
-                        <div class="result-list">
-                            <div class="result">
-                                <h3><b>1.</b> <a href="http://biodiversitylibrary.org/item/35421" target="item">Checklist of Palaearctic and Indian mammals 1758 to 1946 / by J.R. Ellerman and T.C.S. Morrison-Scott.</a> (3 matching pages)</h3>
-                                <div class="thumbnail-container">
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="PALAEARCTIC AND INDIAN MAMMALS 1 758-1946 Erinaceus europael's nesiotes Bate, 1906 1906. <em>Erinaceus</em> <em>europaeus</em> nesiotes Bate, P.Z.S. igo^, 2: 316. Near Gonia, Western Crete. <em>Erinaceus</em>" href="http://biodiversitylibrary.org/page/8727615">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727615">
-                                        </a>
-                                    </div>
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="Shensi, to Manchuria (part). <em>Erinaceus</em> <em>europaeus</em> hispanicus Barrett-Hamilton, 1900 1900. <em>Erinaceus</em> <em>europaeus</em> hispanicus Barrett-Hamilton, Ann. Mag. N.H. j.- 363. Seville, Spain. Range" href="http://biodiversitylibrary.org/page/8727614">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727614">
-                                        </a>
-                                    </div>
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="<em>Erinaceus</em> <em>europaeus</em> europaeus Linnaeus, 1 758 1758. Ennacais tiiropaais Linnaeus, Syst. Xat. loth ed. /.• 52. Wamlingbo, South Gothland Island, Sweden (see Thomas, 191 1, P.Z.S. 142). 1779. Hvstrix" href="http://biodiversitylibrary.org/page/8727613">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727613">
-                                        </a>
-                                    </div>
-                                </div>
+                        <div id="bhl-integration">
+                            <h2>Name references found in the Biodiversity Heritage Library</h2>
+                            <div id="bhl-results-list" class="result-list">
                             </div>
-                            <div class="result">
-                                <h3><b>2.</b> <a href="http://biodiversitylibrary.org/item/35421" target="item">Checklist of Palaearctic and Indian mammals 1758 to 1946 / by J.R. Ellerman and T.C.S. Morrison-Scott.</a> (3 matching pages)</h3>
-                                <div class="thumbnail-container">
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="PALAEARCTIC AND INDIAN MAMMALS 1 758-1946 Erinaceus europael's nesiotes Bate, 1906 1906. <em>Erinaceus</em> <em>europaeus</em> nesiotes Bate, P.Z.S. igo^, 2: 316. Near Gonia, Western Crete. <em>Erinaceus</em>" href="http://biodiversitylibrary.org/page/8727615">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727615">
-                                        </a>
-                                    </div>
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="Shensi, to Manchuria (part). <em>Erinaceus</em> <em>europaeus</em> hispanicus Barrett-Hamilton, 1900 1900. <em>Erinaceus</em> <em>europaeus</em> hispanicus Barrett-Hamilton, Ann. Mag. N.H. j.- 363. Seville, Spain. Range" href="http://biodiversitylibrary.org/page/8727614">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727614">
-                                        </a>
-                                    </div>
-                                    <div class="page-thumbnail">
-                                        <a data-toggle="tooltip" data-placement="bottom" data-html="true" title="<em>Erinaceus</em> <em>europaeus</em> europaeus Linnaeus, 1 758 1758. Ennacais tiiropaais Linnaeus, Syst. Xat. loth ed. /.• 52. Wamlingbo, South Gothland Island, Sweden (see Thomas, 191 1, P.Z.S. 142). 1779. Hvstrix" href="http://biodiversitylibrary.org/page/8727613">
-                                            <img alt="Page Id 8727615" src="http://biodiversitylibrary.org/pagethumb/8727613">
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pagination-buttons">
-                            <input type="button" class="btn btn-default" onclick="doBhlSearch(10,10, true)" value="Next page">
                         </div>
 
-                        <h2>Name references found in the TROVE - NLA </h2>
-                        <p>Number of matches in TROVE: 75</p>
-                        <div class="result-list">
-                            <div class="result">
-                                <h3><b>1.</b> <a href="http://trove.nla.gov.au/work/36747985">Diversity and dynamics of the mammalian fauna in Denmark throughout the last glacial-interglacial cycle, 115-0 kyr BP / by Kim Aaris-Sørensen</a></h3>
-                                <p><strong>Contributors:</strong> Aaris-Sørensen, Kim</p>
-                                <p><strong>Date issued:</strong> 2009</p>
+                        <div id="trove-integration" class="hide">
+                            <h2>Name references found in the TROVE - NLA </h2>
+                            <p>Number of matches in TROVE: 75</p>
+                            <div class="result-list">
+
                             </div>
                         </div>
-                        <div class="pagination-buttons">
-                            <input type="button" class="btn btn-default" value="Previous page" id="previousTrove">
-                            <input type="button" class="btn btn-default" value="Next page" id="nextTrove">
-                        </div>
+
                     </section>
 
                     <section class="tab-pane fade" id="sequences">
                         <h2>Genbank</h2>
-                        <p>Results: 1 to 20 of 222381 – <a href="http://www.ncbi.nlm.nih.gov/nuccore/?term=%22Erinaceus+europaeus%22">View all results</a></p>
-                        <div class="result-list">
-                            <div class="result">
-                                <h3><a href="http://www.ncbi.nlm.nih.gov/nuccore/XM_007532280.1">PREDICTED: Erinaceus europaeus myelin oligodendrocyte glycoprotein (MOG), mRNA</a></h3>
-                                <p>813 bp linear mRNA</p>
-                                <p><strong>Accession: </strong> XM_007532280.1</p>
-                                <p><strong>GI:</strong> 617644691</p>
-                            </div>
-                            <div class="result">
-                                <h3><a href="http://www.ncbi.nlm.nih.gov/nuccore/XM_007532280.1">PREDICTED: Erinaceus europaeus myelin oligodendrocyte glycoprotein (MOG), mRNA</a></h3>
-                                <p>813 bp linear mRNA</p>
-                                <p><strong>Accession: </strong> XM_007532280.1</p>
-                                <p><strong>GI:</strong> 617644691</p>
-                            </div>
-                            <div class="result">
-                                <h3><a href="http://www.ncbi.nlm.nih.gov/nuccore/XM_007532280.1">PREDICTED: Erinaceus europaeus myelin oligodendrocyte glycoprotein (MOG), mRNA</a></h3>
-                                <p>813 bp linear mRNA</p>
-                                <p><strong>Accession: </strong> XM_007532280.1</p>
-                                <p><strong>GI:</strong> 617644691</p>
-                            </div>
+                        <p class="genbankResultCount"></p>
+                        <div class="genbank-results result-list">
+
                         </div>
                     </section>
-
                     <section class="tab-pane fade" id="data-providers">
                         <h2>Data Providers</h2>
                     </section>
-
                 </div>
             </div>
         </div><!-- end main-content -->
     </section>
+
+    <!-- taxon-summary-thumb template -->
+    <div id="taxon-summary-thumb-template"
+         class="taxon-summary-thumb hide"
+         style="">
+        <a data-toggle="lightbox"
+           data-gallery="taxon-summary-gallery"
+           data-parent=".taxon-summary-gallery"
+           data-title=""
+           data-footer=""
+           href="">
+        </a>
+    </div>
+
+    <!-- thumbnail template -->
+    <a id="taxon-thumb-template"
+       class="taxon-thumb hide"
+       data-toggle="lightbox"
+       data-gallery=""
+       data-title=""
+       data-footer=""
+       href="">
+        <img src="" alt="">
+        <div class="thumb-caption caption-brief"></div>
+        <div class="thumb-caption caption-detail"></div>
+    </a>
+
+    <!-- eol -->
+    <div id="descriptionTemplate" class="panel panel-default panel-description" style="display:none;">
+        <div class="panel-heading">
+            <h3 class="panel-title title"></h3>
+        </div>
+        <div class="panel-body">
+            <p class="content"></p>
+        </div>
+        <div class="panel-footer">
+            <p>Source: <a href="#" class="providedBy"></a> <span class="rights"></span></p>
+        </div>
+    </div>
+
+    <!-- genbank -->
+    <div id="genbankTemplate" class="result hide">
+        <h3><a href="" class="externalLink"></a></h3>
+        <p class="description"></p>
+        <p class="furtherDescription"></p>
+    </div>
+
 <r:script>
         // global var to pass GSP vars into JS file
         var SHOW_CONF = {
@@ -600,7 +503,7 @@
                             var $description = $('#descriptionTemplate').clone()
                             $description.css({'display':'block'});
                             $description.attr('id', dataObject.id);
-                            $description.find(".title").html(dataObject.title);
+                            $description.find(".title").html(dataObject.title ?  dataObject.title : 'Description');
                             $description.find(".content").html(dataObject.description);
                             $description.find(".sourceLink").attr('href',dataObject.source);
                             $description.find(".sourceLink").html(dataObject.rightsHolder)
@@ -615,14 +518,19 @@
 
             //load Genbank content
             $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
-                $('#genbankResultCount').html('-  <a href="' + data.resultsUrl + '"> view all results - ' + data.total + '</a>');
-                if(data.results){
-                    $.each(data.results, function(idx, result){
-                       $('#genbank').append('<tr><td>'+
-                            '<a class="externalLink" href="' + result.link + '">' + result.title + '</a><br/>' +
-                            '<span class="">' + result.description + '</span><br/>' +
-                            '<span class="">' + result.furtherDescription +'</span></td></tr>');
-                    });
+                if(data.total){
+                    $('.genbankResultCount').html('<a href="' + data.resultsUrl + '">View all results - ' + data.total + '</a>');
+                    if(data.results){
+                        $.each(data.results, function(idx, result){
+                           var $genbank =  $('#genbankTemplate').clone();
+                           $genbank.removeClass('hide');
+                           $genbank.find('.externalLink').attr('href', result.link);
+                           $genbank.find('.externalLink').html(result.title);
+                           $genbank.find('.description').html(result.description);
+                           $genbank.find('.furtherDescription').html(result.furtherDescription);
+                           $('.genbank-results').append($genbank);
+                        });
+                    }
                 }
             });
 
@@ -717,6 +625,8 @@
             });
         }
 </r:script>
+
+
 
 </body>
 </html>

@@ -6,9 +6,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
+/**
+ * Controller that proxies external webservice calls to get around cross domain issues
+ * and to make consumption of services easier from javascript.
+ */
 class ExternalSiteController {
 
+    def grailsApplication
+
     def index() {}
+
 
     def genbankBase = "http://www.ncbi.nlm.nih.gov"
     def scholarBase = "http://scholar.google.com"
@@ -27,7 +34,7 @@ class ExternalSiteController {
         if(json.results){
             def pageId = json.results[0].id
             def pageUrl = "http://eol.org/api/pages/1.0/${pageId}.json?images=00&videos=0&sounds=0&maps=0&text=2&iucn=false&subjects=overview&licenses=all&details=true&references=true&vetted=0&cache_ttl="
-            println(pageUrl)
+            log.debug(pageUrl)
             def pageText = new URL(pageUrl).text
             response.setContentType("application/json")
             render pageText

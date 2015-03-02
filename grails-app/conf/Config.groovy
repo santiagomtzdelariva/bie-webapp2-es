@@ -191,7 +191,7 @@ grails.resources.adhoc.includes = [
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.resources.debug = false
+        grails.resources.debug = true
     }
     test {
         grails.logging.jul.usebridge = false
