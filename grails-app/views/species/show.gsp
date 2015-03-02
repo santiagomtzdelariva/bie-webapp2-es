@@ -387,8 +387,17 @@
                     </section>
                     <section class="tab-pane fade" id="data-providers">
                         <h2>Data Providers</h2>
-                        <ul id="data-providers-list" class="data-providers-list">
-                        </ul>
+                        <table id="data-providers-list"  class="table name-table  table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Data provider</th>
+                                <th>Records</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+
                     </section>
                 </div>
             </div>

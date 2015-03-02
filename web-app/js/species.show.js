@@ -136,8 +136,9 @@ function loadDataProviders(){
         $.each(data.facetResults[0].fieldResult, function(idx, facetValue){
 
             var queryUrl = uiUrl + "&fq=" + facetValue.fq;
+            var datasetUrl =
 
-            $('#data-providers-list').append("<li><a href='" + queryUrl + "'><span class='data-provider-name'>" + facetValue.label + "</span> <span class='record-count'>(" + facetValue.count +  " records)</span></a></li>");
+            $('#data-providers-list tbody').append("<tr><td><a href='" + queryUrl + "'><span class='data-provider-name'>" + facetValue.label + "</span></a></td><td><a href='" + queryUrl + "'><span class='record-count'>" + facetValue.count +  "</span></a></td></tr>");
         });
     });
 }
