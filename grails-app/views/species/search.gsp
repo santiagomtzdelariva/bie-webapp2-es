@@ -204,8 +204,10 @@
                         <g:each var="result" in="${searchResults.results}">
                             <g:set var="sectionText"><g:if test="${!facetMap.idxtype}"><span><b>Section:</b> <g:message code="idxType.${result.idxType}"/></span></g:if></g:set>
                                 <g:if test="${result.has("idxType") && result.idxType == 'TAXON'}">
-                                    <div class="result row-fluid">
-                                        <div class="result">
+
+                                    <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
+                                    <div class="result">
+                                        <div class="row-fluid">
 
                                             <g:if test="${result.smallImageUrl}">
                                                 <div class="result-thumbnail">
@@ -214,8 +216,6 @@
                                             </g:if>
 
                                             <h4>
-                                                <g:set var="speciesPageLink">${request.contextPath}/species/${result.linkIdentifier?:result.guid}</g:set>
-
                                                 <g:if test="${result.rank}"><span style="text-transform: capitalize; display: inline;">${result.rank}</span>:</g:if>
                                                 <g:if test="${result.linkIdentifier}">
                                                     <a href="${request.contextPath}/species/${result.linkIdentifier}" class="occurrenceLink"><bie:formatSciName rankId="${result.rankId}" name="${(result.nameComplete) ? result.nameComplete : result.name}" acceptedName="${result.acceptedConceptName}"/> </a>
