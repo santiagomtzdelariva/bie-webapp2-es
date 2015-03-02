@@ -275,7 +275,7 @@ function loadOverviewImages(){
     var url = SHOW_CONF.biocacheServiceUrl  +
         '/occurrences/search.json?q=' +
         SHOW_CONF.scientificName +
-        '&fq=multimedia:"Image"&facet=off&pageSize=4&start=0&callback=?';
+        '&fq=multimedia:"Image"&facet=off&pageSize=5&start=0&callback=?';
 
     console.log('Loading images from: ' + url);
 
@@ -296,13 +296,20 @@ function loadOverviewImages(){
             $('.mainOverviewImageInfo').html(data.occurrences[0].dataResourceName);
 
             if(data.occurrences.length >= 2){
-                addOverviewThumb(data.occurrences[1], "1")
+                var $thumb = generateOverviewThumb(data.occurrences[1], "1");
+                $('#overview-thumbs').append($thumb);
             }
             if(data.occurrences.length >= 3){
-                addOverviewThumb(data.occurrences[2], "1")
+                var $thumb = generateOverviewThumb(data.occurrences[2], "2");
+                $('#overview-thumbs').append($thumb);
             }
             if(data.occurrences.length >= 4){
-                addOverviewThumb(data.occurrences[3], "1")
+                var $thumb = generateOverviewThumb(data.occurrences[3], "3");
+                $('#overview-thumbs').append($thumb);
+            }
+            if(data.occurrences.length >= 5){
+                var occurrence  = data.occurrences[4];
+                $('#more-photo-thumb-link').attr('style', 'background-image:url(' + occurrence.smallImageUrl + ')');
             }
         }
     }).fail(function(jqxhr, textStatus, error) {
@@ -312,7 +319,7 @@ function loadOverviewImages(){
     });
 }
 
-function addOverviewThumb(occurrence, id){
+function generateOverviewThumb(occurrence, id){
     var $taxonSummaryThumb = $('#taxon-summary-thumb-template').clone();
     var $taxonSummaryThumbLink = $taxonSummaryThumb.find('a');
     $taxonSummaryThumb.removeClass('hide');
@@ -321,7 +328,8 @@ function addOverviewThumb(occurrence, id){
     $taxonSummaryThumbLink.attr('data-title', getImageTitleFromOccurrence(occurrence));
     $taxonSummaryThumbLink.attr('data-footer', getImageFooterFromOccurrence(occurrence));
     $taxonSummaryThumbLink.attr('href', occurrence.largeImageUrl);
-    $('#overview-thumbs').append($taxonSummaryThumb);
+    return $taxonSummaryThumb;
+
 }
 
 /**

@@ -94,7 +94,28 @@
 
                                     <div class="thumb-row hide">
                                         <div id="overview-thumbs"></div>
-                                        <div class="taxon-summary-thumb" style="">
+
+                                        <!--
+                                        <div class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg)">
+                                            <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
+                                        </div>
+                                        -->
+
+
+                                        <!--
+
+
+<div id="taxon-summary-thumb-4" class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/16016/332c8b02-e9e1-4de1-b322-c9b56998fb34/34ca2ff2e40e1e2dcc7817ceb068880e__small.jpg)">
+        <a href="#gallery" class="more-photos tab-link" title="More photos"><span>+</span></a>
+    </div>
+
+
+                                        -->
+
+
+
+
+                                        <div id="more-photo-thumb-link" class="taxon-summary-thumb" style="">
                                             <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
                                         </div>
                                     </div>

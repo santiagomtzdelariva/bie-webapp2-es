@@ -184,7 +184,7 @@ grails.exceptionresolver.params.exclude = ['password']
 grails.hibernate.cache.queries = true
 
 grails.resources.adhoc.includes = [
-        '/bootstrap/img/**', '/images/**', '/css/**', '/js/**', '/img/**', '/fonts/**'
+        '/bootstrap/img/**', '/images/**', '/css/**', '/js/**', '/img/**', '/fonts/**', '/bootstrap3/fonts/**'
 ]
 
 // set per-environment serverURL stem for creating absolute links
