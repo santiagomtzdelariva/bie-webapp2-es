@@ -94,27 +94,6 @@
 
                                     <div class="thumb-row hide">
                                         <div id="overview-thumbs"></div>
-
-                                        <!--
-                                        <div class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/8462/0fbb2255-e077-47e9-bc81-e25041257bf9/172d8284b3db4129de704ae02c67f072__large.jpg)">
-                                            <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
-                                        </div>
-                                        -->
-
-
-                                        <!--
-
-
-<div id="taxon-summary-thumb-4" class="taxon-summary-thumb" style="background-image:url(http://ala-demo.gbif.org/biocache-media/dr1089/16016/332c8b02-e9e1-4de1-b322-c9b56998fb34/34ca2ff2e40e1e2dcc7817ceb068880e__small.jpg)">
-        <a href="#gallery" class="more-photos tab-link" title="More photos"><span>+</span></a>
-    </div>
-
-
-                                        -->
-
-
-
-
                                         <div id="more-photo-thumb-link" class="taxon-summary-thumb" style="">
                                             <a class="more-photos tab-link" href="#gallery" title="More Photos"><span>+</span></a>
                                         </div>
@@ -183,10 +162,10 @@
                                     <div class="panel-footer">
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <p><strong>39,769</strong> occurrence records</p>
+                                                <p><strong><span class="occurenceCount"></span></strong> occurrence record</p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <p><strong>104</strong> datasets</p>
+                                                <p><strong><span class="datasetCount"></span></strong> datasets</p>
                                             </div>
                                         </div>
                                     </div>
@@ -198,7 +177,15 @@
                                     </div>
                                     <div class="panel-body">
                                         <p><strong>116</strong> organisations have provided data to the UK Wildlife Portal for this [taxon rank].</p>
-                                        <p><a class="tab-link" href="#data-providers">Browse the list of data providers</a> and find organisations you can join if you are interested in participating in a survey for [taxon rank] such as [taxon name].</p>
+                                        <p><a class="tab-link" href="#data-providers">Browse the list of data providers</a> and find organisations you can join if you are
+                                        interested in participating in a survey for
+                                        <g:if test="${tc.taxonConcept?.rankID > 6000}">
+                                            species like ${sciNameFormatted}
+                                        </g:if>
+                                        <g:else>
+                                            species of ${sciNameFormatted}.
+                                        </g:else>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -442,7 +429,7 @@
     <a id="taxon-thumb-template"
        class="taxon-thumb hide"
        data-toggle="lightbox"
-       data-gallery=""
+       data-gallery="main-image-gallery"
        data-title=""
        data-footer=""
        href="">

@@ -123,20 +123,18 @@ function loadDataProviders(){
     var url = SHOW_CONF.biocacheServiceUrl  +
         '/occurrences/search.json?q=' +
         SHOW_CONF.scientificName +
-        '&pageSize=0' +
+        '&pageSize=0&flimit=-1' +
         '&facet=on&facets=data_resource_uid&callback=?';
 
     var uiUrl = SHOW_CONF.biocacheUrl  +
         '/occurrences/search?q=' +
         SHOW_CONF.scientificName;
-;
 
     $.getJSON(url, function(data){
-        console.log(data);
+        $('.datasetCount').html(data.facetResults[0].fieldResult.length);
         $.each(data.facetResults[0].fieldResult, function(idx, facetValue){
 
             var queryUrl = uiUrl + "&fq=" + facetValue.fq;
-            var datasetUrl =
 
             $('#data-providers-list tbody').append("<tr><td><a href='" + queryUrl + "'><span class='data-provider-name'>" + facetValue.label + "</span></a></td><td><a href='" + queryUrl + "'><span class='record-count'>" + facetValue.count +  "</span></a></td></tr>");
         });
@@ -218,7 +216,7 @@ function loadCharts(){
         biocacheServicesUrl: SHOW_CONF.biocacheServiceUrl,
         biocacheWebappUrl: SHOW_CONF.biocacheUrl,
         collectionsUrl: SHOW_CONF.collectoryUrl,
-        totalRecordsSelector: "span#occurenceCount",
+        totalRecordsSelector: ".occurenceCount",
         chartsDiv: "recordBreakdowns",
         error: chartsError,
         width: 540,
