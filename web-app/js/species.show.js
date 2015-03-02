@@ -12,16 +12,6 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  */
-
-/**
- *
- * Javascript for species "show" page.
- *
- * User: nick
- * Date: 12/06/12
- * Time: 2:15 PM
- */
-
 /**
  * jQuery page onload callback
  */
@@ -29,45 +19,198 @@ function showSpeciesPage() {
 
     console.log("Starting show species page");
 
+    //load content
     loadOverviewImages();
+    loadMap();
     loadGalleries();
-    doBhlSearch(0, 10, false);
+    loadBhl(0, 10, false);
+    loadCharts();
+    loadExpertDistroMap();
+    loadExternalSources();
+    loadTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
+    loadDataProviders();
 
-    //
-    //var bhlInit = false;
-    //var galleryInit = false;
-    //$('a[data-toggle="tab"]').on('shown', function(e) {
-    //    //console.log("this", $(this).attr('id'));
-    //    var id = $(this).attr('id');
-    //    if (id == "t6" && !bhlInit) {
-    //        doBhlSearch(0, 10, false);
-    //        bhlInit = true;
-    //    } else if (id == "t2" && !galleryInit) {
-    //        loadGalleries();
-    //        galleryInit = true;
-    //    }
-    //    if (id != "t1") {
-    //        location.hash = 'tab_'+ $(e.target).attr('href').substr(1);
-    //    } else {
-    //        location.hash = '';
-    //    }
-    //});
+    //setup controls
+    addAlerts();
+}
 
-    //setup tabs
-    if (location.hash !== '') {
-        $('.nav-tabs a[href="' + location.hash.replace('tab_','') + '"]').tab('show');
-    }
-    $(window).on('hashchange', function() {
-        //console.log('hashchange');
-        var currentHash = location.hash.replace('tab_','');
-        if (location.hash !== '') {
-            //console.log('changing tab to ' + currentHash);
-            $('.nav-tabs a[href="' + currentHash + '"]').tab('show');
-        } else {
-            $('.nav-tabs a:first').tab('show');
+function addAlerts(){
+    // alerts button
+    $("#alertsButton").click(function(e) {
+        e.preventDefault();
+        //console.log("alertsButton");
+        var query = "Species: " + SHOW_CONF.scientificName;
+        var searchString = "?q=" + SHOW_CONF.guid;
+        //console.log("fqueries",fqueries, query);
+        var url = SHOW_CONF.alertsUrl + "createBiocacheNewRecordsAlert?";
+        url += "queryDisplayName=" + encodeURIComponent(query);
+        url += "&baseUrlForWS=" + encodeURIComponent(SHOW_CONF.biocacheUrl);
+        url += "&baseUrlForUI=" + encodeURIComponent(SHOW_CONF.serverName);
+        url += "&webserviceQuery=%2Fws%2Foccurrences%2Fsearch" + encodeURIComponent(searchString);
+        url += "&uiQuery=%2Foccurrences%2Fsearch%3Fq%3D*%3A*";
+        url += "&resourceName=" + encodeURIComponent("Atlas of Living Australia");
+        window.location.href = url;
+    });
+}
+
+function loadMap() {
+    //add an occurrence layer for this taxon
+    var taxonLayer = L.tileLayer.wms(SHOW_CONF.biocacheServiceUrl + "/mapping/wms/reflect?q=" + SHOW_CONF.scientificName, {
+        layers: 'ALA:occurrences',
+        format: 'image/png',
+        transparent: true,
+        attribution: "${raw(grailsApplication.config.skin.orgNameLong)}",
+        bgcolor: "0x000000",
+        outline: "true",
+        ENV: "color:5574a6;name:circle;size:4;opacity:1"
+    });
+
+    var speciesLayers = new L.LayerGroup();
+    taxonLayer.addTo(speciesLayers);
+
+    var map = L.map('leafletMap', {
+        center: [54.6, -3.2],
+        zoom: 5,
+        layers: [speciesLayers]
+    });
+
+    var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="http://mapbox.com">Mapbox</a>';
+    var mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+    var defaultBaseLayer = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr});
+
+    defaultBaseLayer.addTo(map);
+
+    var baseLayers = {
+        "Default": defaultBaseLayer
+    };
+
+    var overlays = {
+        "${sciNameFormatted}": taxonLayer
+    };
+
+    L.control.layers(baseLayers, overlays).addTo(map);
+
+    map.on('click', onMapClick);
+    map.invalidateSize(false);
+}
+
+function onMapClick(e) {
+    $.ajax({
+        url: SHOW_CONF.biocacheServiceUrl + "/occurrences/info",
+        jsonp: "callback",
+        dataType: "jsonp",
+        data: {
+            q: SHOW_CONF.scientificName,
+            zoom: "6",
+            lat: e.latlng.lat,
+            lon: e.latlng.lng,
+            radius: 20,
+            format: "json"
+        },
+        success: function (response) {
+            var popup = L.popup()
+                .setLatLng(e.latlng)
+                .setContent("Occurrences at this point: " + response.count)
+                .openOn(map);
+        }
+    });
+}
+
+function loadDataProviders(){
+
+    var url = SHOW_CONF.biocacheServiceUrl  +
+        '/occurrences/search.json?q=' +
+        SHOW_CONF.scientificName +
+        '&pageSize=0' +
+        '&facet=on&facets=data_resource_uid&callback=?';
+
+    var uiUrl = SHOW_CONF.biocacheUrl  +
+        '/occurrences/search?q=' +
+        SHOW_CONF.scientificName;
+;
+
+    $.getJSON(url, function(data){
+        console.log(data);
+        $.each(data.facetResults[0].fieldResult, function(idx, facetValue){
+
+            var queryUrl = uiUrl + "&fq=" + facetValue.fq;
+
+            $('#data-providers-list').append("<li><a href='" + queryUrl + "'><span class='data-provider-name'>" + facetValue.label + "</span> <span class='record-count'>(" + facetValue.count +  " records)</span></a></li>");
+        });
+    });
+}
+
+function loadExternalSources(){
+    //load EOL content
+    console.log('####### Loading EOL content - ' + SHOW_CONF.eolUrl);
+    $.ajax({url: SHOW_CONF.eolUrl}).done(function ( data ) {
+        console.log(data);
+        console.log('Loading EOL content - ' + data.dataObjects.length);
+        //clone a description template...
+        if(data.dataObjects){
+            console.log('Loading EOL content - ' + data.dataObjects.length);
+            $.each(data.dataObjects, function(idx, dataObject){
+                if(dataObject.language == SHOW_CONF.eolLanguage){
+                    var $description = $('#descriptionTemplate').clone()
+                    $description.css({'display':'block'});
+                    $description.attr('id', dataObject.id);
+                    $description.find(".title").html(dataObject.title ?  dataObject.title : 'Description');
+                    $description.find(".content").html(dataObject.description);
+                    $description.find(".sourceLink").attr('href',dataObject.source);
+                    $description.find(".sourceLink").html(dataObject.rightsHolder)
+                    $description.find(".rights").html(dataObject.rights)
+                    $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
+                    $description.find(".providedBy").html("Encyclopedia of Life")
+                    $description.appendTo('#descriptiveContent');
+                }
+            });
         }
     });
 
+    //load Genbank content
+    $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
+        if(data.total){
+            $('.genbankResultCount').html('<a href="' + data.resultsUrl + '">View all results - ' + data.total + '</a>');
+            if(data.results){
+                $.each(data.results, function(idx, result){
+                    var $genbank =  $('#genbankTemplate').clone();
+                    $genbank.removeClass('hide');
+                    $genbank.find('.externalLink').attr('href', result.link);
+                    $genbank.find('.externalLink').html(result.title);
+                    $genbank.find('.description').html(result.description);
+                    $genbank.find('.furtherDescription').html(result.furtherDescription);
+                    $('.genbank-results').append($genbank);
+                });
+            }
+        }
+    });
+
+    //load sound content
+    $.ajax({url: SHOW_CONF.soundUrl}).done(function ( data ) {
+        if(data.sounds){
+            $('#sounds').append('<h3 style="clear:left;">Sounds</h3>');
+            $('#sounds').append('<audio src="' + data.sounds[0].alternativeFormats['audio/mpeg'] + '" preload="auto" />' );
+            audiojs.events.ready(function() {
+                var as = audiojs.createAll();
+            });
+            var source = "";
+            if(data.processed.attribution.collectionName){
+                source = data.processed.attribution.collectionName
+            } else {
+                source = data.processed.attribution.dataResourceName
+            }
+            $('#sounds').append('<span>Source: ' + source + '</span><br/>' );
+            $('#sounds').append('<span><a href="${biocacheUrl}/occurrence/'+ data.raw.uuid +'">View more details of this audio</a></span>' );
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        //alert( "error" + errorThrown);
+    });
+}
+
+
+function loadCharts(){
     // Charts via collectory charts.js
     var chartOptions = {
         query: SHOW_CONF.scientificName,
@@ -91,38 +234,6 @@ function showSpeciesPage() {
     console.log(chartOptions);
 
     loadFacetCharts(chartOptions);
-    //facetChartGroup.loadAndDrawFacetCharts(chartOptions);
-
-    // alerts button
-    $("#alertsButton").click(function(e) {
-        e.preventDefault();
-        //console.log("alertsButton");
-        var query = "Species: " + SHOW_CONF.scientificName;
-        var searchString = "?q=" + SHOW_CONF.guid;
-        //console.log("fqueries",fqueries, query);
-        var url = SHOW_CONF.alertsUrl + "createBiocacheNewRecordsAlert?";
-        url += "queryDisplayName=" + encodeURIComponent(query);
-        url += "&baseUrlForWS=" + encodeURIComponent(SHOW_CONF.biocacheUrl);
-        url += "&baseUrlForUI=" + encodeURIComponent(SHOW_CONF.serverName);
-        url += "&webserviceQuery=%2Fws%2Foccurrences%2Fsearch" + encodeURIComponent(searchString);
-        url += "&uiQuery=%2Foccurrences%2Fsearch%3Fq%3D*%3A*";
-        url += "&resourceName=" + encodeURIComponent("Atlas of Living Australia");
-        window.location.href = url;
-    });
-
-    $(".thumbImageBrowse").tooltip();
-    $(".col-narrow a").tooltip({ position: "bottom right", offset: [0, -20], opacity: 0.9});
-
-    // mouse over affect on thumbnail images
-    $('#gallery').on('hover', '.imgCon', function() {
-        $(this).find('.brief, .detail').toggleClass('hide');
-    });
-
-    // add expert distrobution map
-    addExpertDistroMap();
-
-    //Trove search results
-    setupTrove(SHOW_CONF.scientificName,'trove-container','trove-results-home','previousTrove','nextTrove');
 }
 
 function chartsError() {
@@ -193,7 +304,6 @@ function loadOverviewImages(){
                 addOverviewThumb(data.occurrences[3], "1")
             }
         }
-
     }).fail(function(jqxhr, textStatus, error) {
         alert('Error loading gallery: ' + textStatus + ', ' + error);
     }).always(function() {
@@ -281,7 +391,7 @@ function loadGalleryType(category, start) {
                 var spinnerLink = $('#gallerySpinner img').attr('src');
                 var btn = '<div class="loadMore ' + category + '"><br><button class="btn" onCLick="loadGalleryType(\'' + category + '\','
                     + (start + pageSize)  + ');">Load more images <img src="' + spinnerLink + '" class="hide"/></button></div>';
-                $categoryTmpl.find('.subGallery').append(btn);
+                $categoryTmpl.find('.taxon-gallery').append(btn);
             }
         }
     }).fail(function(jqxhr, textStatus, error) {
@@ -321,7 +431,7 @@ function getImageFooterFromOccurrence(el){
  * @param rows
  * @param scroll
  */
-function doBhlSearch(start, rows, scroll) {
+function loadBhl(start, rows, scroll) {
     if (!start) {
         start = 0;
     }
@@ -409,11 +519,11 @@ function doBhlSearch(start, rows, scroll) {
 
             buf += '<div id="button-bar">';
             if (prevStart >= 0) {
-                buf += '<input type="button" class="btn" value="Previous page" onclick="doBhlSearch(' + prevStart + ',' + rows + ', true)">';
+                buf += '<input type="button" class="btn" value="Previous page" onclick="loadBhl(' + prevStart + ',' + rows + ', true)">';
             }
             buf += '&nbsp;&nbsp;&nbsp;';
             if (nextStart <= maxItems) {
-                buf += '<input type="button" class="btn" value="Next page" onclick="doBhlSearch(' + nextStart + ',' + rows + ', true)">';
+                buf += '<input type="button" class="btn" value="Next page" onclick="loadBhl(' + nextStart + ',' + rows + ', true)">';
             }
 
             buf += '</div>';
@@ -445,7 +555,7 @@ function cancelSearch(msg) {
     return true;
 }
 
-function addExpertDistroMap() {
+function loadExpertDistroMap() {
     var url = "http://spatial.ala.org.au/layers-service/distribution/map/" + SHOW_CONF.guid + "?callback=?";
     $.getJSON(url, function(data){
         if (data.available) {

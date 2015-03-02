@@ -39,6 +39,7 @@ class ExternalSiteController {
             response.setContentType("application/json")
             render pageText
         } else {
+            response.setContentType("application/json")
             render ([:] as JSON)
         }
     }

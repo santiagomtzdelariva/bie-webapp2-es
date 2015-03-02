@@ -32,7 +32,7 @@
          * OnLoad equavilent in JQuery
          */
         $(document).ready(function() {
-            doBhlSearch(0, 10, false);
+            loadBhl(0, 10, false);
         });
 
         /**

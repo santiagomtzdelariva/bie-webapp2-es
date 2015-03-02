@@ -150,11 +150,11 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="row">
-                                            <div class="col-sm-4">
-                                                <p>A donut chart will go here.</p>
+                                            <div class="col-sm-3 col-xs-5">
+                                                <img class="img-responsive" src="http://www.cerulean.co.nz/atlas/images/demo-stats-chart.png">
                                             </div>
-                                            <div class="col-sm-8">
-                                                <p>Some information about statistics will go here.</p>
+                                            <div class="col-sm-9 col-xs-7">
+                                                <p><strong>58%</strong> of records fully verified.</p>
                                                 <p><a class="tab-link" href="#records">More statistics</a></p>
                                             </div>
                                         </div>
@@ -311,34 +311,6 @@
 
                     <section class="tab-pane fade" id="classification">
 
-                        <style type="text/css">
-                        section#classification dl#classificationList {
-                            margin-left:0;
-                        }
-                        section#classification dl {
-                            margin:4px 0 0 24px;
-                        }
-                        @media screen and (max-width: 600px) {
-                            section#classification dl {
-                                margin:4px 0 0 0px;
-                            }
-                        }
-                        section#classification dl dt {
-                            float:left;
-                            padding-right:10px;
-                        }
-                        section#classification dl  dd {
-                            padding-top: 1px;
-                            display: block;
-                        }
-                        section#classification dd img {
-                            vertical-align:middle;
-                        }
-                        section#classification dl.childClassification dt,section#classification dl.childClassification dd {
-                            float:none;
-                        }
-                        </style>
-
                         <h2>
                             <g:if test="${grailsApplication.config.classificationSupplier}">${grailsApplication.config.classificationSupplier}</g:if>
                             Classification
@@ -415,6 +387,8 @@
                     </section>
                     <section class="tab-pane fade" id="data-providers">
                         <h2>Data Providers</h2>
+                        <ul id="data-providers-list" class="data-providers-list">
+                        </ul>
                     </section>
                 </div>
             </div>
@@ -468,164 +442,32 @@
     </div>
 
 <r:script>
-        // global var to pass GSP vars into JS file
-        var SHOW_CONF = {
-            biocacheUrl:        "${grailsApplication.config.biocache.baseURL}",
-            biocacheServiceUrl: "${grailsApplication.config.biocacheService.baseURL}",
-            collectoryUrl:      "${grailsApplication.config.collectory.baseURL}",
-            guid:               "${guid}",
-            scientificName:     "${tc?.taxonConcept?.nameString?:''}",
-            synonymsQuery:      "${synonymsQuery}",
-            citizenSciUrl:      "${citizenSciUrl}",
-            serverName:         "${grailsApplication.config.grails.serverURL}",
-            bieUrl:             "${grailsApplication.config.bie.baseURL}",
-            alertsUrl:          "${grailsApplication.config.alerts.baseUrl}",
-            remoteUser:         "${request.remoteUser?:''}",
-            eolUrl:             "${createLink(controller: 'externalSite', action:'eol',params:[s:tc?.taxonConcept?.nameString?:''])}",
-            genbankUrl:         "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
-            scholarUrl:         "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
-            soundUrl:           "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}"
-        }
-        // load google charts api
-        google.load("visualization", "1", {packages:["corechart"]});
+    // global var to pass GSP vars into JS file
+    var SHOW_CONF = {
+        biocacheUrl:        "${grailsApplication.config.biocache.baseURL}",
+        biocacheServiceUrl: "${grailsApplication.config.biocacheService.baseURL}",
+        collectoryUrl:      "${grailsApplication.config.collectory.baseURL}",
+        guid:               "${guid}",
+        scientificName:     "${tc?.taxonConcept?.nameString?:''}",
+        synonymsQuery:      "${synonymsQuery}",
+        citizenSciUrl:      "${citizenSciUrl}",
+        serverName:         "${grailsApplication.config.grails.serverURL}",
+        bieUrl:             "${grailsApplication.config.bie.baseURL}",
+        alertsUrl:          "${grailsApplication.config.alerts.baseUrl}",
+        remoteUser:         "${request.remoteUser?:''}",
+        eolUrl:             "${createLink(controller: 'externalSite', action:'eol',params:[s:tc?.taxonConcept?.nameString?:''])}",
+        genbankUrl:         "${createLink(controller: 'externalSite', action:'genbank',params:[s:tc?.taxonConcept?.nameString?:''])}",
+        scholarUrl:         "${createLink(controller: 'externalSite', action:'scholar',params:[s:tc?.taxonConcept?.nameString?:''])}",
+        soundUrl:           "${createLink(controller: 'species', action:'soundSearch',params:[s:tc?.taxonConcept?.nameString?:''])}",
+        eolLanguage:        "${grailsApplication.config.eol.lang}"
+    }
+    // load google charts api
+    google.load("visualization", "1", {packages:["corechart"]});
 
-        $(function(){
-
-            //load EOL content
-            $.ajax({url: SHOW_CONF.eolUrl}).done(function ( data ) {
-                console.log(data);
-                console.log('Loading EOL content - ' + data.dataObjects.length);
-                //clone a description template...
-                if(data.dataObjects){
-                    console.log('Loading EOL content - ' + data.dataObjects.length);
-                    $.each(data.dataObjects, function(idx, dataObject){
-                        if(dataObject.language == "${grailsApplication.config.eol.lang}"){
-                            var $description = $('#descriptionTemplate').clone()
-                            $description.css({'display':'block'});
-                            $description.attr('id', dataObject.id);
-                            $description.find(".title").html(dataObject.title ?  dataObject.title : 'Description');
-                            $description.find(".content").html(dataObject.description);
-                            $description.find(".sourceLink").attr('href',dataObject.source);
-                            $description.find(".sourceLink").html(dataObject.rightsHolder)
-                            $description.find(".rights").html(dataObject.rights)
-                            $description.find(".providedBy").attr('href', 'http://eol.org/pages/' + data.identifier);
-                            $description.find(".providedBy").html("Encyclopedia of Life")
-                            $description.appendTo('#descriptiveContent');
-                        }
-                    });
-                }
-            });
-
-            //load Genbank content
-            $.ajax({url: SHOW_CONF.genbankUrl}).done(function ( data ) {
-                if(data.total){
-                    $('.genbankResultCount').html('<a href="' + data.resultsUrl + '">View all results - ' + data.total + '</a>');
-                    if(data.results){
-                        $.each(data.results, function(idx, result){
-                           var $genbank =  $('#genbankTemplate').clone();
-                           $genbank.removeClass('hide');
-                           $genbank.find('.externalLink').attr('href', result.link);
-                           $genbank.find('.externalLink').html(result.title);
-                           $genbank.find('.description').html(result.description);
-                           $genbank.find('.furtherDescription').html(result.furtherDescription);
-                           $('.genbank-results').append($genbank);
-                        });
-                    }
-                }
-            });
-
-            //load sound content
-            $.ajax({url: SHOW_CONF.soundUrl}).done(function ( data ) {
-                if(data.sounds){
-                    $('#sounds').append('<h3 style="clear:left;">Sounds</h3>');
-                    $('#sounds').append('<audio src="' + data.sounds[0].alternativeFormats['audio/mpeg'] + '" preload="auto" />' );
-                    audiojs.events.ready(function() {
-                        var as = audiojs.createAll();
-                    });
-                    var source = "";
-                    if(data.processed.attribution.collectionName){
-                        source = data.processed.attribution.collectionName
-                    } else {
-                        source = data.processed.attribution.dataResourceName
-                    }
-                    $('#sounds').append('<span>Source: ' + source + '</span><br/>' );
-                    $('#sounds').append('<span><a href="${biocacheUrl}/occurrence/'+ data.raw.uuid +'">View more details of this audio</a></span>' );
-                }
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                //alert( "error" + errorThrown);
-            });
-
-            loadMap();
-
-            showSpeciesPage();
-        })
-
-        function loadMap() {
-            //add an occurrence layer for this taxon
-            var taxonLayer = L.tileLayer.wms(SHOW_CONF.biocacheServiceUrl + "/mapping/wms/reflect?q=" + SHOW_CONF.scientificName, {
-                layers: 'ALA:occurrences',
-                format: 'image/png',
-                transparent: true,
-                attribution: "${raw(grailsApplication.config.skin.orgNameLong)}",
-                bgcolor: "0x000000",
-                outline: "true",
-                ENV: "color:5574a6;name:circle;size:4;opacity:1"
-            });
-
-            var speciesLayers = new L.LayerGroup();
-            taxonLayer.addTo(speciesLayers);
-
-            var map = L.map('leafletMap', {
-                center: [54.6, -3.2],
-                zoom: 5,
-                layers: [speciesLayers]
-            });
-
-            var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                    'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-            var mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
-            var defaultBaseLayer = L.tileLayer(mbUrl, {id: 'examples.map-20v6611k', attribution: mbAttr});
-
-            defaultBaseLayer.addTo(map);
-
-            var baseLayers = {
-                "Default": defaultBaseLayer
-            };
-
-            var overlays = {
-                "${sciNameFormatted}": taxonLayer
-            };
-
-            L.control.layers(baseLayers, overlays).addTo(map);
-
-            map.on('click', onMapClick);
-            map.invalidateSize(false);
-        }
-
-        function onMapClick(e) {
-            $.ajax({
-                url: SHOW_CONF.biocacheServiceUrl + "/occurrences/info",
-                jsonp: "callback",
-                dataType: "jsonp",
-                data: {
-                    q: SHOW_CONF.scientificName,
-                    zoom: "6",
-                    lat: e.latlng.lat,
-                    lon: e.latlng.lng,
-                    radius: 20,
-                    format: "json"
-                },
-                success: function (response) {
-                    var popup = L.popup()
-                            .setLatLng(e.latlng)
-                            .setContent("Occurrences at this point: " + response.count)
-                            .openOn(map);
-                }
-            });
-        }
+    $(function(){
+        showSpeciesPage();
+    })
 </r:script>
-
 
 
 </body>

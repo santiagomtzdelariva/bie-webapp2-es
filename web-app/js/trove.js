@@ -29,7 +29,7 @@ function getTroveUrl(){
   return TROVE.url + '&q=' + TROVE.q + '&s=' + TROVE.s + '&n=' + TROVE.n;
 }
 
-function setupTrove(query, containerDivId, resultsDivId, previousButtonId, nextButtonId){
+function loadTrove(query, containerDivId, resultsDivId, previousButtonId, nextButtonId){
     TROVE.q = query;
     TROVE.containerDivId = containerDivId
     TROVE.divId = resultsDivId

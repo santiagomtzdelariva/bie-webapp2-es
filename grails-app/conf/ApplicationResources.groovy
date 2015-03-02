@@ -29,11 +29,12 @@ modules = {
     }
 
     show {
-        defaultBundle('')
         dependsOn 'cleanHtml, ekko'
         resource url: 'https://ajax.googleapis.com/jsapi', attrs: [type: 'js'], disposition: 'head'
         resource url: "http://leafletjs.com/dist/leaflet.js", attrs: [type: 'js'], disposition: 'head'
         resource url: "http://leafletjs.com/dist/leaflet.css", attrs: [type: 'css'], disposition: 'head'
+
+        resource url: [dir: 'css', file: 'species.css']
         resource url: [dir: 'css', file: 'jquery.qtip.min.css']
         resource url: [dir: 'js', file: 'jquery.sortElemets.js', disposition: 'head']
         resource url: [dir: 'js', file: 'jquery.jsonp-2.3.1.min.js', disposition: 'head']
