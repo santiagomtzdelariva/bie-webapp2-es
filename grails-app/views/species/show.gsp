@@ -176,7 +176,7 @@
                                         <h3 class="panel-title">Data Providers</h3>
                                     </div>
                                     <div class="panel-body">
-                                        <p><strong>116</strong> organisations have provided data to the UK Wildlife Portal for this [taxon rank].</p>
+                                        <p><strong><span class="datasetCount"></span></strong> datasets have provided data to the UK Wildlife Portal for this ${tc.taxonConcept.rankString}.</p>
                                         <p><a class="tab-link" href="#data-providers">Browse the list of data providers</a> and find organisations you can join if you are
                                         interested in participating in a survey for
                                         <g:if test="${tc.taxonConcept?.rankID > 6000}">
